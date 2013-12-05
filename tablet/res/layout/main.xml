@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="fill_parent"
+              android:layout_height="fill_parent"
+
+              android:id="@+id/main"
+        >
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            >
+        <EditText
+                android:layout_width="wrap_content"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                />
+        <Button android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Test"
+                />
+
+
+    </LinearLayout>
+
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_weight="1"
+                  android:orientation="vertical">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                      android:orientation="horizontal" android:gravity="center" >
+
+            <RadioGroup
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:id="@+id/create_paragon"
+                    android:onClick="createParagon">
+
+                <RadioButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/radioButton3"
+                        android:singleLine="false"
+                        android:focusableInTouchMode="false"/>
+
+                <RadioButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/radioButton2"
+                        android:singleLine="false"
+                        android:checked="true"
+                        android:enabled="true"/>
+
+                <RadioButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/radioButton"/>
+            </RadioGroup>
+        </LinearLayout>
+        <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent"
+                      android:orientation="horizontal">
+            <ImageButton android:layout_width="wrap_content"
+                         android:layout_height="match_parent"
+                         android:width="10dp"
+                    />
+            <ViewFlipper android:layout_width="wrap_content" android:layout_height="match_parent"
+                         android:layout_weight="1">
+
+            </ViewFlipper>
+            <ImageButton android:layout_width="wrap_content"
+                         android:layout_height="match_parent"
+                         android:width="10dp"
+                    />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:background="#449def"
+            android:showDividers="middle"
+            android:divider="@drawable/bottom_bar_diveder"
+            android:paddingTop="3dp"
+           >
+           >
+        <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                android:background="@drawable/bottom_bar_button_selector"
+                android:src="@drawable/ic_action_new"
+                />
+        <ImageButton android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:src="@drawable/ic_action_discard"
+                android:background="@drawable/bottom_bar_button_selector"
+                />
+    </LinearLayout>
+</LinearLayout>
+
