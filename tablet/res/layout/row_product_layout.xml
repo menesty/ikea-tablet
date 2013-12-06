@@ -3,14 +3,19 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:orientation="vertical"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:background="?android:attr/activatedBackgroundIndicator">
 
     <TextView
             android:id="@+id/label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@+id/label"
-            android:textSize="30px">
+            >
     </TextView>
+    <ImageButton android:layout_width="wrap_content"
+                 android:src="@drawable/ic_action_discard"
+                 android:background="@drawable/row_product_button"
+                 android:layout_height="wrap_content"
+                 android:layout_alignParentRight="true"/>
 
 </RelativeLayout>

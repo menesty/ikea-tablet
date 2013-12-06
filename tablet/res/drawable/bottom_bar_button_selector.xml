@@ -16,10 +16,11 @@
         </shape>
     </item>
     <item >
-        <shape >
+        <shape>
 
             <solid
-                    android:color="#E8E8E8" />
+                    android:color="#E8E8E8"
+                    />
             <padding
                     android:left="10dp"
                     android:top="10dp"

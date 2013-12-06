@@ -17,15 +17,14 @@
                 android:layout_width="wrap_content"
                 android:layout_weight="1"
                 android:layout_height="match_parent"
-                android:focusable="true"
-                android:focusableInTouchMode="true"
-                />
+                android:inputType="number"
+                android:id="@+id/productNumberField"
+                android:numeric="integer"/>
 
         <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Add"
-
                 android:onClick="addProductItem"/>
 
 
@@ -62,8 +61,10 @@
             <ImageButton
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:width="10dp"
-                    />
+                    android:onClick="previousParagon"
+                    android:id="@+id/previousButton"
+                    android:src="@drawable/arrow_left"
+                    android:background="@drawable/navigation_button_selector"/>
 
             <ViewFlipper
                     android:layout_width="wrap_content"
@@ -76,8 +77,11 @@
             <ImageButton
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:width="10dp"
-                    />
+                    android:width="20dp"
+                    android:onClick="nextParagon"
+                    android:src="@drawable/arrow_right"
+                    android:id="@+id/nextButton" android:background="@drawable/navigation_button_selector"
+                    android:clickable="true"/>
 
         </LinearLayout>
 

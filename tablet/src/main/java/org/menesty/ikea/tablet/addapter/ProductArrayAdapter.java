@@ -50,4 +50,13 @@ public class ProductArrayAdapter extends ArrayAdapter<ProductItem> {
         holder.text.setText(list.get(position).artNumber);
         return view;
     }
+
+    public ProductItem[] getItems() {
+        ProductItem[] items = new ProductItem[getCount()];
+
+        for (int i = 0; i < getCount(); i++)
+            items[i] = getItem(i);
+
+        return items;
+    }
 }

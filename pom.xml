@@ -13,6 +13,7 @@
 		<platform.version> 4.1.1.4
 					</platform.version>
 		<android.plugin.version>3.6.0</android.plugin.version>
+        <android.sdk.path>/Users/Menesty/Downloads/adt-bundle-mac-x86_64-20131030/sdk</android.sdk.path>
 	</properties>
 
 	<dependencyManagement>
