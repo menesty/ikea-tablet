@@ -6,11 +6,13 @@
 
               android:id="@+id/main"
         >
+
     <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             >
+
         <EditText
                 android:layout_width="wrap_content"
                 android:layout_weight="1"
@@ -18,61 +20,63 @@
                 android:focusable="true"
                 android:focusableInTouchMode="true"
                 />
-        <Button android:layout_width="wrap_content"
+
+        <Button
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Test"
-                />
+                android:text="Add"
+
+                android:onClick="addProductItem"/>
 
 
     </LinearLayout>
 
-    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_weight="1"
-                  android:orientation="vertical">
-        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-                      android:orientation="horizontal" android:gravity="center" >
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+        <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center">
 
             <RadioGroup
                     android:layout_width="fill_parent"
                     android:layout_height="fill_parent"
                     android:orientation="horizontal"
                     android:gravity="center"
-                    android:id="@+id/create_paragon"
-                    android:onClick="createParagon">
+                    android:id="@+id/paragon_group"
+                    >
 
-                <RadioButton
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:id="@+id/radioButton3"
-                        android:singleLine="false"
-                        android:focusableInTouchMode="false"/>
-
-                <RadioButton
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:id="@+id/radioButton2"
-                        android:singleLine="false"
-                        android:checked="true"
-                        android:enabled="true"/>
-
-                <RadioButton
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:id="@+id/radioButton"/>
             </RadioGroup>
         </LinearLayout>
-        <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent"
-                      android:orientation="horizontal">
-            <ImageButton android:layout_width="wrap_content"
-                         android:layout_height="match_parent"
-                         android:width="10dp"
+
+        <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+            <ImageButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:width="10dp"
                     />
-            <ViewFlipper android:layout_width="wrap_content" android:layout_height="match_parent"
-                         android:layout_weight="1">
+
+            <ViewFlipper
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:id="@+id/listViewContainer">
 
             </ViewFlipper>
-            <ImageButton android:layout_width="wrap_content"
-                         android:layout_height="match_parent"
-                         android:width="10dp"
+
+            <ImageButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:width="10dp"
                     />
 
         </LinearLayout>
@@ -87,21 +91,24 @@
             android:showDividers="middle"
             android:divider="@drawable/bottom_bar_diveder"
             android:paddingTop="3dp"
-           >
-           >
+            >
+        >
+
         <ImageButton
                 android:layout_width="wrap_content"
                 android:layout_weight="1"
                 android:layout_height="match_parent"
                 android:background="@drawable/bottom_bar_button_selector"
                 android:src="@drawable/ic_action_new"
-                />
-        <ImageButton android:layout_width="wrap_content"
+                android:onClick="createParagon"/>
+
+        <ImageButton
+                android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:src="@drawable/ic_action_discard"
                 android:background="@drawable/bottom_bar_button_selector"
-                />
+                android:onClick="deleteParagon"/>
     </LinearLayout>
 </LinearLayout>
 
