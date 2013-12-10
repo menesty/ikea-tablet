@@ -32,7 +32,7 @@ public class LoadServerDataTask extends BaseAsyncTask<Object, Integer, List<Avai
                     onProgressUpdate();
                 } else
                     input = tmpData();
-                SystemClock.sleep(10000);
+                SystemClock.sleep(5000);
                 return new DataLoader().readJsonStream(input);
 
 

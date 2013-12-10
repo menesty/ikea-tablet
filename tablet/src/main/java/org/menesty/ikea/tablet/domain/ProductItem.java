@@ -8,15 +8,18 @@ import android.os.Parcelable;
  */
 public class ProductItem implements Parcelable {
 
-    public ProductItem(Parcel in){
+    public ProductItem(Parcel in) {
         artNumber = in.readString();
         count = in.readInt();
         price = in.readDouble();
         weight = in.readInt();
     }
 
-    public ProductItem(String productId) {
+    public ProductItem(String productId, int count, double price, int weight) {
         this.artNumber = productId;
+        this.count = count;
+        this.price = price;
+        this.weight = weight;
     }
 
     public String artNumber;

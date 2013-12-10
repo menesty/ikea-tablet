@@ -1,21 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                android:orientation="vertical"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="?android:attr/activatedBackgroundIndicator">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:orientation="horizontal"
+              android:background="?android:attr/activatedBackgroundIndicator"
+              android:showDividers="middle"
+              android:divider="@drawable/bottom_bar_diveder"
+              android:paddingTop="@dimen/product_item_padding_top_bottom"
+              android:paddingBottom="@dimen/product_item_padding_top_bottom"
+        >
 
     <TextView
             android:id="@+id/label"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="15dp"
+            android:textSize="@dimen/product_item_text_size"
+            android:text="ProductId"
+            android:layout_weight="1"/>
+
+    <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            >
-    </TextView>
-    <ImageButton android:layout_width="wrap_content"
-                 android:src="@drawable/ic_action_discard"
-                 android:background="@drawable/row_product_button"
-                 android:layout_height="wrap_content"
-                 android:layout_alignParentRight="true"/>
+            android:id="@+id/count"
+            android:textSize="@dimen/product_item_text_size"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:text="Count"
+            android:gravity="right"
+            />
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/weight"
+            android:textSize="@dimen/product_item_text_size"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:text="Weight"
+            android:gravity="right"
+            />
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/price"
+            android:textSize="@dimen/product_item_text_size"
+            android:paddingLeft="10dp"
+            android:paddingRight="5dp"
+            android:text="Price"
+            android:gravity="right"
+            />
 
-</RelativeLayout>
+</LinearLayout>
