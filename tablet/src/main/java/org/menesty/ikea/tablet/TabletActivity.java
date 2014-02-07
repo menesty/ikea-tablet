@@ -27,6 +27,9 @@ public class TabletActivity extends Activity implements TaskCallbacks {
     private static volatile ProgressDialog mProgressDialog;
     private TaskFragment mTaskFragment;
 
+    public TabletActivity() {
+        Config.init();
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -48,7 +51,7 @@ public class TabletActivity extends Activity implements TaskCallbacks {
         mTaskFragment = (TaskFragment) fm.findFragmentByTag("task");
 
         mTaskFragment = new TaskFragment(this);
-        mTaskFragment.start(new LoadServerDataTask(), "blablabla");
+        mTaskFragment.start(new LoadServerDataTask(), Config.getServerUrl(), Config.getUser(), Config.getPassword());
         fm.beginTransaction().add(mTaskFragment, "task").commit();
 
     }
