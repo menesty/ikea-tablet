@@ -29,6 +29,10 @@ public class TabletActivity extends Activity implements TaskCallbacks {
 
     private View.OnTouchListener listViewOnTouchListener;
 
+    public TabletActivity() {
+        Config.init();
+    }
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -47,7 +51,7 @@ public class TabletActivity extends Activity implements TaskCallbacks {
         mProgressDialog = ProgressDialog.show(this, "", getResources().getString(R.string.load_data_from_server), true);
 
         TaskFragment mTaskFragment = new TaskFragment(this);
-        mTaskFragment.start(new LoadServerDataTask(), "blablabla");
+        mTaskFragment.start(new LoadServerDataTask(), Config.getServerUrl(), Config.getUser(), Config.getPassword());
         getFragmentManager().beginTransaction().add(mTaskFragment, "task").commit();
 
     }
