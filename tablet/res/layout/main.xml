@@ -7,28 +7,10 @@
               android:id="@+id/main"
         >
 
-    <LinearLayout
-            android:layout_width="match_parent"
+    <ImageButton
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            >
-
-        <EditText
-                android:layout_width="wrap_content"
-                android:layout_weight="1"
-                android:layout_height="match_parent"
-                android:inputType="number"
-                android:id="@+id/productNumberField"
-                android:numeric="integer"/>
-
-        <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Add"
-                android:onClick="addProductItem"/>
-
-
-    </LinearLayout>
+            android:id="@+id/focus_button"/>
 
     <LinearLayout
             android:layout_width="match_parent"
@@ -58,13 +40,6 @@
                 android:layout_height="match_parent"
                 android:orientation="horizontal">
 
-            <ImageButton
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:onClick="previousParagon"
-                    android:id="@+id/previousButton"
-                    android:src="@drawable/arrow_left"
-                    android:background="@drawable/navigation_button_selector"/>
 
             <ViewFlipper
                     android:layout_width="wrap_content"
@@ -73,15 +48,6 @@
                     android:id="@+id/listViewContainer">
 
             </ViewFlipper>
-
-            <ImageButton
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:width="20dp"
-                    android:onClick="nextParagon"
-                    android:src="@drawable/arrow_right"
-                    android:id="@+id/nextButton" android:background="@drawable/navigation_button_selector"
-                    android:clickable="true"/>
 
         </LinearLayout>
 
@@ -104,7 +70,7 @@
                 android:layout_height="match_parent"
                 android:background="@drawable/bottom_bar_button_selector"
                 android:src="@drawable/ic_action_new"
-                android:onClick="createParagon"/>
+                android:onClick="showSelectProductDialog"/>
 
         <ImageButton
                 android:layout_width="wrap_content"
@@ -112,7 +78,7 @@
                 android:layout_weight="1"
                 android:src="@drawable/ic_action_discard"
                 android:background="@drawable/bottom_bar_button_selector"
-                android:onClick="deleteParagon"/>
+                android:onClick="deleteProductItem"/>
     </LinearLayout>
 </LinearLayout>
 
