@@ -34,7 +34,7 @@ public class DataLoader {
 
     private AvailableProductItem readMessage(JsonReader reader) throws IOException {
         String productName = null;
-        String productNumber = null;
+        String productId = null;
         double count = 0;
         double weight = 0;
         double price = 0;
@@ -48,9 +48,9 @@ public class DataLoader {
         while (reader.hasNext()) {
             String name = reader.nextName();
             if (name.equals("productNumber"))
-                productNumber = reader.nextString();
-            else if (name.equals("productNumber"))
                 productName = reader.nextString();
+            else if (name.equals("productId"))
+                productId = reader.nextString();
             else if (name.equals("count"))
                 count = reader.nextDouble();
             else if (name.equals("weight"))
@@ -72,7 +72,7 @@ public class DataLoader {
 
         }
         reader.endObject();
-        return new AvailableProductItem(productNumber, productName, shortName, count, price, weight, zestav, allowed, visible, orderId);
+        return new AvailableProductItem(productId, productName, shortName, count, price, weight, zestav, allowed, visible, orderId);
     }
 
 }
