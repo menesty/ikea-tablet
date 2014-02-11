@@ -9,15 +9,20 @@ import android.os.PowerManager;
 import android.util.Log;
 import android.view.*;
 import android.view.animation.AnimationUtils;
-import android.widget.*;
-import org.menesty.ikea.tablet.addapter.ProductArrayAdapter;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import android.widget.ViewFlipper;
 import org.menesty.ikea.tablet.component.ProductViewLayout;
 import org.menesty.ikea.tablet.dialog.ProductChoiceDialog;
 import org.menesty.ikea.tablet.domain.AvailableProductItem;
 import org.menesty.ikea.tablet.domain.ProductItem;
+import org.menesty.ikea.tablet.task.BaseAsyncTask;
 import org.menesty.ikea.tablet.task.LoadServerDataTask;
 import org.menesty.ikea.tablet.task.TaskCallbacks;
 import org.menesty.ikea.tablet.util.TaskFragment;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class TabletActivity extends Activity implements TaskCallbacks {
 
@@ -29,14 +34,12 @@ public class TabletActivity extends Activity implements TaskCallbacks {
 
     private View.OnTouchListener listViewOnTouchListener;
 
-    public TabletActivity() {
-        Config.init();
-    }
-
+    private List<AvailableProductItem> products = new ArrayList<AvailableProductItem>();
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Config.init(this);
         setContentView(R.layout.main);
         init();
 
@@ -50,9 +53,12 @@ public class TabletActivity extends Activity implements TaskCallbacks {
     private void loadDataFromServer() {
         mProgressDialog = ProgressDialog.show(this, "", getResources().getString(R.string.load_data_from_server), true);
 
-        TaskFragment mTaskFragment = new TaskFragment(this);
-        mTaskFragment.start(new LoadServerDataTask(), Config.getServerUrl(), Config.getUser(), Config.getPassword());
-        getFragmentManager().beginTransaction().add(mTaskFragment, "task").commit();
+        TaskFragment mTaskFragment = (TaskFragment) getFragmentManager().findFragmentByTag("task");
+        if (mTaskFragment == null) {
+            mTaskFragment = new TaskFragment(this);
+            mTaskFragment.start(new LoadServerDataTask(), Config.getServerUrl(), Config.getUser(), Config.getPassword());
+            getFragmentManager().beginTransaction().add(mTaskFragment, "task").commit();
+        }
 
     }
 
@@ -221,6 +227,7 @@ public class TabletActivity extends Activity implements TaskCallbacks {
             };
             dialog.show(fm, "dialog");
         }
+        dialog.setAvailableProductItem(products);
     }
 
     public void deleteProductItem(View view) {
@@ -257,6 +264,9 @@ public class TabletActivity extends Activity implements TaskCallbacks {
         }
     }
 
+    public void reloadAll(MenuItem view) {
+        loadDataFromServer();
+    }
 
     private <T> T cast(Object view) {
         return (T) view;
@@ -284,7 +294,7 @@ public class TabletActivity extends Activity implements TaskCallbacks {
     }
 
     @Override
-    public void onPostExecute() {
+    public void onPostExecute(BaseAsyncTask task, Object result) {
         mProgressDialog.dismiss();
         mProgressDialog = null;
 
@@ -294,6 +304,9 @@ public class TabletActivity extends Activity implements TaskCallbacks {
 
         if (wl.isHeld())
             wl.release();
+
+        if (task instanceof LoadServerDataTask)
+            products = (List<AvailableProductItem>) result;
 
     }
 

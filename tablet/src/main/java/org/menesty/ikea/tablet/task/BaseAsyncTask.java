@@ -19,4 +19,13 @@ public abstract class BaseAsyncTask<Params, Progress, Result> extends AsyncTask<
         if (statusListener != null)
             statusListener.setRunning(value);
     }
+
+    @Override
+    protected void onPostExecute(Result result) {
+        if (callbacks != null)
+            callbacks.onPostExecute(this, result);
+
+        if (statusListener != null)
+            statusListener.setRunning(false);
+    }
 }

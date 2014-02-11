@@ -8,5 +8,5 @@ public interface TaskCallbacks {
 
     public void onCancelled();
 
-    public void onPostExecute();
+    public void onPostExecute(BaseAsyncTask task, Object result);
 }

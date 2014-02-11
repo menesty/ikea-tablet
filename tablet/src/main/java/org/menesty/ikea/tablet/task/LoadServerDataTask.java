@@ -42,7 +42,7 @@ public class LoadServerDataTask extends BaseAsyncTask<Object, Integer, List<Avai
                 return null;
 
             input = connection.getInputStream();
-            onProgressUpdate();
+            onProgressUpdate(100);
 
             return new DataLoader().readJsonStream(input);
         } catch (Exception e) {
@@ -79,7 +79,7 @@ public class LoadServerDataTask extends BaseAsyncTask<Object, Integer, List<Avai
 
     @Override
     protected void onPostExecute(List<AvailableProductItem> result) {
-        callbacks.onPostExecute();
+        callbacks.onPostExecute(this, result);
         setRunning(false);
     }
 }

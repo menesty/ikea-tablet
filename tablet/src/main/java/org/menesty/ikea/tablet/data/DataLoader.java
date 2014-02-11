@@ -34,27 +34,45 @@ public class DataLoader {
 
     private AvailableProductItem readMessage(JsonReader reader) throws IOException {
         String productName = null;
-        int count = 0;
-        int weight = 0;
+        String productNumber = null;
+        double count = 0;
+        double weight = 0;
         double price = 0;
+        boolean zestav = false;
+        String shortName = null;
+        boolean allowed = true;
+        int orderId = 0;
+        boolean visible = true;
 
         reader.beginObject();
         while (reader.hasNext()) {
             String name = reader.nextName();
-            if (name.equals("productName")) {
+            if (name.equals("productNumber"))
+                productNumber = reader.nextString();
+            else if (name.equals("productNumber"))
                 productName = reader.nextString();
-            } else if (name.equals("count")) {
-                count = reader.nextInt();
-            } else if (name.equals("weight")) {
-                weight = reader.nextInt();
-            } else if (name.equals("price")) {
+            else if (name.equals("count"))
+                count = reader.nextDouble();
+            else if (name.equals("weight"))
+                weight = reader.nextDouble();
+            else if (name.equals("price"))
                 price = reader.nextDouble();
-            } else {
+            else if (name.equals("zestav"))
+                zestav = reader.nextString().equals("1");
+            else if (name.equals("shortName"))
+                shortName = reader.nextString();
+            else if (name.equals("allowed"))
+                allowed = reader.nextString().equals("1");
+            else if (name.equals("orderId"))
+                orderId = reader.nextInt();
+            else if (name.equals("visible"))
+                visible = reader.nextString().equals("1");
+            else
                 reader.skipValue();
-            }
+
         }
         reader.endObject();
-        return new AvailableProductItem(productName, count, price, weight);
+        return new AvailableProductItem(productNumber, productName, shortName, count, price, weight, zestav, allowed, visible, orderId);
     }
 
 }

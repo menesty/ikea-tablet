@@ -21,17 +21,33 @@ import java.util.List;
  * Created by Menesty on 12/8/13.
  */
 public abstract class ProductChoiceDialog extends DialogFragment {
+    private List<AvailableProductItem> products;
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         // Use the Builder class for convenient dialog construction
         final ProductAvailableAdapter adapter = new ProductAvailableAdapter(getActivity());
-        adapter.addAll(generate());
+        adapter.addAll(products);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         final EditText editText = new EditText(getActivity());
         final ListView listview = new ListView(getActivity());
         editText.setCompoundDrawablesWithIntrinsicBounds(R.drawable.discoverseed_larg, 0, 0, 0);
+        editText.addTextChangedListener(new TextWatcher() {
+            public void afterTextChanged(Editable s) {
+
+            }
+
+            public void beforeTextChanged(CharSequence s,
+                                          int start, int count, int after) {
+
+            }
+
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                editText.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
+                adapter.getFilter().filter(s);
+            }
+        });
 
         LinearLayout layout = new LinearLayout(getActivity());
         layout.setOrientation(LinearLayout.VERTICAL);
@@ -48,21 +64,7 @@ public abstract class ProductChoiceDialog extends DialogFragment {
                 onItemSelect(adapter.getItem(i));
             }
         });
-        editText.addTextChangedListener(new TextWatcher() {
-            public void afterTextChanged(Editable s) {
 
-            }
-
-            public void beforeTextChanged(CharSequence s,
-                                          int start, int count, int after) {
-
-            }
-
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                editText.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
-                adapter.getFilter().filter(s);
-            }
-        });
         builder.setNegativeButton("cancel", new DialogInterface.OnClickListener() {
 
             @Override
@@ -74,13 +76,10 @@ public abstract class ProductChoiceDialog extends DialogFragment {
         return builder.create();
     }
 
-    private List<AvailableProductItem> generate() {
-        List<AvailableProductItem> result = new ArrayList<AvailableProductItem>();
-        for (int i = 1; i < 15; i++) {
-            result.add(new AvailableProductItem(i + "Product ", i, i, i * 500));
-        }
-        return result;
+    public abstract void onItemSelect(AvailableProductItem item);
+
+    public void setAvailableProductItem(List<AvailableProductItem> products) {
+        this.products = products;
     }
 
-    public abstract void onItemSelect(AvailableProductItem item);
 }
