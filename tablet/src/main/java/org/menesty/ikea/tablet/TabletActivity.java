@@ -11,6 +11,7 @@ import android.view.*;
 import android.view.animation.AnimationUtils;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.Toast;
 import android.widget.ViewFlipper;
 import org.menesty.ikea.tablet.component.ProductViewLayout;
 import org.menesty.ikea.tablet.dialog.ProductChoiceDialog;
@@ -21,7 +22,6 @@ import org.menesty.ikea.tablet.task.LoadServerDataTask;
 import org.menesty.ikea.tablet.task.TaskCallbacks;
 import org.menesty.ikea.tablet.util.TaskFragment;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class TabletActivity extends Activity implements TaskCallbacks {
@@ -34,7 +34,7 @@ public class TabletActivity extends Activity implements TaskCallbacks {
 
     private View.OnTouchListener listViewOnTouchListener;
 
-    private List<AvailableProductItem> products = new ArrayList<AvailableProductItem>();
+    private ProductState productState = new ProductState();
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -106,11 +106,13 @@ public class TabletActivity extends Activity implements TaskCallbacks {
                     case MotionEvent.ACTION_UP:
                         float delta = fromPosition - motionEvent.getX();
                         float percentage = view.getMeasuredWidth() > view.getMeasuredHeight() ? 0.2f : 0.3f;
+
                         if (Math.abs(delta) > view.getMeasuredWidth() * percentage)
                             if (delta > 0)
                                 scrollFlipperView(1);
                             else
                                 scrollFlipperView(-1);
+                        break;
 
                     default:
                         break;
@@ -154,7 +156,16 @@ public class TabletActivity extends Activity implements TaskCallbacks {
         if (listView == null)
             return;
 
-        listView.add(new ProductItem(productId, 1, 110.2, 1000));
+        AvailableProductItem product = productState.find(productId);
+
+        if (product == null) {
+            Toast.makeText(getApplicationContext(), "Product not available in order", Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        productState.takeProduct(product);
+
+        listView.add(new ProductItem(product.productId, product.count, product.price, product.weight));
         listView.requestLayout();
 
     }
@@ -227,7 +238,7 @@ public class TabletActivity extends Activity implements TaskCallbacks {
             };
             dialog.show(fm, "dialog");
         }
-        dialog.setAvailableProductItem(products);
+        dialog.setAvailableProductItem(productState.getCurrentState());
     }
 
     public void deleteProductItem(View view) {
@@ -306,7 +317,7 @@ public class TabletActivity extends Activity implements TaskCallbacks {
             wl.release();
 
         if (task instanceof LoadServerDataTask)
-            products = (List<AvailableProductItem>) result;
+            productState.setBaseState((List<AvailableProductItem>) result);
 
     }
 
