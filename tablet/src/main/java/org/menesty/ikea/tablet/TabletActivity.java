@@ -36,6 +36,16 @@ public class TabletActivity extends Activity implements TaskCallbacks {
 
     private ProductState productState = new ProductState();
 
+    private static TabletActivity instance;
+
+    public TabletActivity() {
+        instance = this;
+    }
+
+    public static TabletActivity get(){
+        return instance;
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -151,23 +161,27 @@ public class TabletActivity extends Activity implements TaskCallbacks {
     }
 
     private void addProduct(String productId) {
-        ProductViewLayout listView = getActiveView();
-
-        if (listView == null)
-            return;
-
-        AvailableProductItem product = productState.find(productId);
+        ProductItem product = productState.find(productId);
 
         if (product == null) {
             Toast.makeText(getApplicationContext(), "Product not available in order", Toast.LENGTH_LONG).show();
             return;
         }
 
-        productState.takeProduct(product);
+        addProduct(product);
 
-        listView.add(new ProductItem(product.productId, product.count, product.price, product.weight));
+    }
+
+    private void addProduct(ProductItem productItem) {
+        ProductViewLayout listView = getActiveView();
+
+        if (listView == null)
+            return;
+
+        productState.takeProduct(productItem);
+
+        listView.add(productItem);
         listView.requestLayout();
-
     }
 
     public ProductViewLayout createParagon(MenuItem menuItem) {
@@ -206,10 +220,12 @@ public class TabletActivity extends Activity implements TaskCallbacks {
             }
 
         outState.putInt("viewCount", viewCount);
+        outState.putParcelableArray("product_base_state", productState.getBaseState());
+        outState.putStringArray("product_state", productState.getState());
+
 
         if (mProgressDialog != null)
             mProgressDialog.dismiss();
-
 
         productIdKeyboardHandler.cancel();
     }
@@ -220,9 +236,27 @@ public class TabletActivity extends Activity implements TaskCallbacks {
         for (int i = 0; i < viewCount; i++)
             restoreState(this.<ProductItem[]>cast(savedInstanceState.getParcelableArray("view_" + i)));
 
+        productState.setBaseState(this.<AvailableProductItem[]>cast(savedInstanceState.getParcelableArray("product_base_state")));
+        productState.setState(savedInstanceState.getStringArray("product_state"));
+
         TaskFragment mTaskFragment = (TaskFragment) getFragmentManager().findFragmentByTag("task");
+
+
         if (mTaskFragment != null && mTaskFragment.isRunning())
             mProgressDialog = ProgressDialog.show(this, "", getResources().getString(R.string.load_data_from_server), true);
+
+
+        ProductChoiceDialog dialog = (ProductChoiceDialog) getFragmentManager().findFragmentByTag("ProductChoiceDialog");
+
+        if (dialog != null) {
+            dialog.setAvailableProductItem(productState.getCurrentState());
+            dialog.setListener(new ProductChoiceDialog.ItemSelectListener() {
+                @Override
+                public void onItemSelect(ProductItem item) {
+                    addProduct(item.productName);
+                }
+            });
+        }
 
     }
 
@@ -230,13 +264,14 @@ public class TabletActivity extends Activity implements TaskCallbacks {
         FragmentManager fm = getFragmentManager();
         ProductChoiceDialog dialog = (ProductChoiceDialog) fm.findFragmentByTag("ProductChoiceDialog");
         if (dialog == null) {
-            dialog = new ProductChoiceDialog() {
+            dialog = new ProductChoiceDialog();
+            dialog.setListener(new ProductChoiceDialog.ItemSelectListener() {
                 @Override
-                public void onItemSelect(AvailableProductItem item) {
-                    addProduct(item.productName);
+                public void onItemSelect(ProductItem item) {
+                    addProduct(item);
                 }
-            };
-            dialog.show(fm, "dialog");
+            });
+            dialog.show(fm, "ProductChoiceDialog");
         }
         dialog.setAvailableProductItem(productState.getCurrentState());
     }
@@ -249,6 +284,9 @@ public class TabletActivity extends Activity implements TaskCallbacks {
 
         ProductItem item = viewLayout.getSelected();
         item.count--;
+
+
+
         viewLayout.update(item);
     }
 

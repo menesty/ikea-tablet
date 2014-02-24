@@ -8,6 +8,7 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 import org.menesty.ikea.tablet.R;
 import org.menesty.ikea.tablet.domain.ProductItem;
+import org.menesty.ikea.tablet.util.NumberUtil;
 
 import java.math.BigDecimal;
 import java.text.NumberFormat;
@@ -57,8 +58,8 @@ public class ProductArrayAdapter extends ArrayAdapter<ProductItem> {
         ViewHolder holder = (ViewHolder) view.getTag();
 
         holder.text.setText(list.get(position).artNumber);
-        holder.count.setText(list.get(position).count + "");
-        holder.price.setText(list.get(position).price + " pl");
+        holder.count.setText(NumberUtil.toString(list.get(position).count));
+        holder.price.setText(NumberUtil.toString(list.get(position).price));
         holder.weight.setText(NumberFormat.getInstance().format(BigDecimal.valueOf(list.get(position).weight / 1000).doubleValue()) + " kg");
 
 

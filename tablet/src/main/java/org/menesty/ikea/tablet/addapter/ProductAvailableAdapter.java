@@ -8,7 +8,8 @@ import android.widget.ArrayAdapter;
 import android.widget.Filter;
 import android.widget.TextView;
 import org.menesty.ikea.tablet.R;
-import org.menesty.ikea.tablet.domain.AvailableProductItem;
+import org.menesty.ikea.tablet.domain.ProductItem;
+import org.menesty.ikea.tablet.util.NumberUtil;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,37 +19,37 @@ import java.util.List;
 /**
  * Created by Menesty on 12/10/13.
  */
-public class ProductAvailableAdapter extends ArrayAdapter<AvailableProductItem> {
+public class ProductAvailableAdapter extends ArrayAdapter<ProductItem> {
 
     private AvailableFilter filter;
 
     private final Object lock = new Object();
 
-    private List<AvailableProductItem> list;
+    private List<ProductItem> list;
 
     public ProductAvailableAdapter(Context context) {
-        this(context, new ArrayList<AvailableProductItem>());
+        this(context, new ArrayList<ProductItem>());
     }
 
-    public ProductAvailableAdapter(Context context, List<AvailableProductItem> list) {
+    public ProductAvailableAdapter(Context context, List<ProductItem> list) {
         super(context, R.layout.alert_list_row, list);
-        this.list = new ArrayList<AvailableProductItem>();
+        this.list = new ArrayList<ProductItem>();
     }
 
     @Override
-    public void add(AvailableProductItem object) {
+    public void add(ProductItem object) {
         super.add(object);
         list.add(object);
     }
 
     @Override
-    public void addAll(Collection<? extends AvailableProductItem> collection) {
+    public void addAll(Collection<? extends ProductItem> collection) {
         super.addAll(collection);
         list.addAll(collection);
     }
 
     @Override
-    public void addAll(AvailableProductItem... items) {
+    public void addAll(ProductItem... items) {
         super.addAll(items);
         list.addAll(Arrays.asList(items));
     }
@@ -62,13 +63,15 @@ public class ProductAvailableAdapter extends ArrayAdapter<AvailableProductItem> 
             convertView = inflater.inflate(R.layout.alert_list_row, null);
 
             holder.productId = (TextView) convertView.findViewById(R.id.productId);
+            holder.count = (TextView) convertView.findViewById(R.id.count);
             convertView.setTag(holder);
         } else
             holder = (ViewHolder) convertView.getTag();
 
 
-        AvailableProductItem item = getItem(position);
+        ProductItem item = getItem(position);
         holder.productId.setText(item.productName);
+        holder.count.setText(NumberUtil.toString(item.count));
 
         return convertView;
     }
@@ -83,6 +86,7 @@ public class ProductAvailableAdapter extends ArrayAdapter<AvailableProductItem> 
 
     private static class ViewHolder {
         TextView productId;
+        TextView count;
     }
 
     class AvailableFilter extends Filter {
@@ -99,13 +103,13 @@ public class ProductAvailableAdapter extends ArrayAdapter<AvailableProductItem> 
             } else {
                 final String prefixString = filterStr.toString().toLowerCase();
 
-                ArrayList<AvailableProductItem> values = new ArrayList<AvailableProductItem>(list);
+                ArrayList<ProductItem> values = new ArrayList<ProductItem>(list);
                 int count = values.size();
 
-                ArrayList<AvailableProductItem> newValues = new ArrayList(count);
+                ArrayList<ProductItem> newValues = new ArrayList(count);
 
                 for (int i = 0; i < count; i++) {
-                    AvailableProductItem item = values.get(i);
+                    ProductItem item = values.get(i);
                     if (item.productName.toLowerCase().contains(prefixString))
                         newValues.add(item);
                 }
@@ -119,7 +123,7 @@ public class ProductAvailableAdapter extends ArrayAdapter<AvailableProductItem> 
         @Override
         protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
             clear();
-            ProductAvailableAdapter.super.addAll((List<AvailableProductItem>) filterResults.values);
+            ProductAvailableAdapter.super.addAll((List<ProductItem>) filterResults.values);
             if (filterResults.count > 0)
                 notifyDataSetChanged();
             else

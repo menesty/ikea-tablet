@@ -3,22 +3,23 @@ package org.menesty.ikea.tablet;
 import org.menesty.ikea.tablet.domain.AvailableProductItem;
 import org.menesty.ikea.tablet.domain.ProductItem;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class ProductState {
     private List<AvailableProductItem> baseState = new ArrayList<AvailableProductItem>();
 
     private Map<String, Double> state = new HashMap<String, Double>();
 
+    public void setBaseState(AvailableProductItem... baseState) {
+        setBaseState(Arrays.asList(baseState));
+    }
+
     public void setBaseState(List<AvailableProductItem> baseState) {
         this.baseState = baseState;
         reset();
     }
 
-    public List<ProductItem> getCurrentState() {
+    public ProductItem[] getCurrentState() {
         List<ProductItem> productItems = new ArrayList<ProductItem>();
 
         for (AvailableProductItem productItem : baseState) {
@@ -27,10 +28,10 @@ public class ProductState {
                 count = count == null ? 0 : count;
 
                 if (count == 0 || count < productItem.count)
-                    productItems.add(new ProductItem(productItem.productId, productItem.count - count, productItem.price, productItem.weight));
+                    productItems.add(new ProductItem(productItem.productId, productItem.productName, productItem.count - count, productItem.price, productItem.weight));
             }
         }
-        return productItems;
+        return productItems.toArray(new ProductItem[0]);
     }
 
     public ProductItem find(String productId) {
@@ -41,7 +42,7 @@ public class ProductState {
                 count = count == null ? 0 : count;
 
                 if (count == 0 || count < productItem.count)
-                    return new ProductItem(productItem.productId, productItem.count - count, productItem.price, productItem.weight);
+                    return new ProductItem(productItem.productId, productItem.productName, productItem.count - count, productItem.price, productItem.weight);
 
                 return null;
             }
@@ -49,32 +50,44 @@ public class ProductState {
         return null;
     }
 
-
-
-    /*
-
-     public void takeProduct(AvailableProductItem product) {
-         if (!product.visible && !product.allowed)
-             throw new RuntimeException("Can't update state because product is not visible or allowed");
-
-         for (AvailableProductItem cProduct : currentState)
-             if (cProduct.productId.equals(product.productId)) {
-                 cProduct.count = cProduct.count - product.count;
-                 return;
-             }
-     }
-
-     public void returnProduct(AvailableProductItem product) {
-         for (AvailableProductItem cProduct : currentState)
-             if (cProduct.productId.equals(product.productId)) {
-                 cProduct.count = cProduct.count + product.count;
-                 return;
-             }
-
-         currentState.add(product);
-     }
- */
     public void reset() {
         state = new HashMap<String, Double>();
+    }
+
+    public void takeProduct(ProductItem product) {
+        String key = product.artNumber + "_" + product.price;
+        Double count = state.get(key);
+        if (count == null)
+            count = 0d;
+        state.put(key, count + product.count);
+
+    }
+
+
+    public AvailableProductItem[] getBaseState() {
+        return baseState.toArray(new AvailableProductItem[0]);
+    }
+
+    public String[] getState() {
+        List<String> result = new ArrayList<String>();
+
+        for (Map.Entry<String, Double> entry : state.entrySet())
+            result.add(entry.getKey() + "|" + entry.getValue());
+
+        return result.toArray(new String[0]);
+    }
+
+    public void setState(String... states) {
+        reset();
+        for (String state : states) {
+            String[] parts = state.split("|");
+            Double count = 0d;
+            try {
+                count = Double.valueOf(parts[1]);
+                this.state.put(parts[0], count);
+            } catch (NumberFormatException e) {
+
+            }
+        }
     }
 }
