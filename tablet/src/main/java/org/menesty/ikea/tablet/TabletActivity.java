@@ -13,6 +13,7 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 import android.widget.ViewFlipper;
+import org.menesty.ikea.tablet.autoupdate.AutoUpdateApk;
 import org.menesty.ikea.tablet.component.ProductViewLayout;
 import org.menesty.ikea.tablet.dialog.ProductChoiceDialog;
 import org.menesty.ikea.tablet.domain.AvailableProductItem;
@@ -57,6 +58,8 @@ public class TabletActivity extends Activity implements TaskCallbacks {
             createParagon(null);
             loadDataFromServer();
         }
+
+        new AutoUpdateApk(getApplicationContext());
 
     }
 
