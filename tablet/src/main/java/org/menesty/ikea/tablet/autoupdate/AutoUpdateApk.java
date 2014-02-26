@@ -121,7 +121,6 @@ public class AutoUpdateApk extends Observable {
     protected final static String TAG = "AutoUpdateApk";
 
     private final static String ANDROID_PACKAGE = "application/vnd.android.package-archive";
-    //	private final static String API_URL = "http://auto-update-apk.appspot.com/check";
     private final static String API_URL = "http://www.auto-update-apk.com/check";
 
     protected static Context context = null;

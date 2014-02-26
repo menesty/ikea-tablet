@@ -7,13 +7,14 @@ import android.content.Context;
 import android.os.Bundle;
 import android.os.PowerManager;
 import android.util.Log;
-import android.view.*;
-import android.view.animation.AnimationUtils;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
+import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 import android.widget.ViewFlipper;
 import org.menesty.ikea.tablet.autoupdate.AutoUpdateApk;
+import org.menesty.ikea.tablet.component.ParagonControlComponent;
 import org.menesty.ikea.tablet.component.ProductViewLayout;
 import org.menesty.ikea.tablet.dialog.ProductChoiceDialog;
 import org.menesty.ikea.tablet.domain.AvailableProductItem;
@@ -33,9 +34,10 @@ public class TabletActivity extends Activity implements TaskCallbacks {
 
     private ProductIdKeyboardHandler productIdKeyboardHandler;
 
-    private View.OnTouchListener listViewOnTouchListener;
 
     private ProductState productState = new ProductState();
+
+    private ParagonControlComponent paragonControlComponent;
 
     private static TabletActivity instance;
 
@@ -43,7 +45,7 @@ public class TabletActivity extends Activity implements TaskCallbacks {
         instance = this;
     }
 
-    public static TabletActivity get(){
+    public static TabletActivity get() {
         return instance;
     }
 
@@ -53,6 +55,7 @@ public class TabletActivity extends Activity implements TaskCallbacks {
         Config.init(this);
         setContentView(R.layout.main);
         init();
+        paragonControlComponent = new ParagonControlComponent(this);
 
         if (savedInstanceState == null) {
             createParagon(null);
@@ -84,55 +87,7 @@ public class TabletActivity extends Activity implements TaskCallbacks {
     }
 
     private void init() {
-        RadioGroup paragonGroup = cast(findViewById(R.id.paragon_group));
-        paragonGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                int index = group.indexOfChild(group.findViewById(checkedId));
-                if (currentActiveParagonIndex == index)
-                    return;
 
-                ViewFlipper flipper = cast(findViewById(R.id.listViewContainer));
-
-                if (currentActiveParagonIndex > index) {
-                    flipper.setInAnimation(AnimationUtils.loadAnimation(getBaseContext(), R.anim.go_prev_in));
-                    flipper.setOutAnimation(AnimationUtils.loadAnimation(getBaseContext(), R.anim.go_prev_out));
-                } else {
-                    flipper.setInAnimation(AnimationUtils.loadAnimation(getBaseContext(), R.anim.go_next_in));
-                    flipper.setOutAnimation(AnimationUtils.loadAnimation(getBaseContext(), R.anim.go_next_out));
-                }
-
-                flipper.setDisplayedChild(index);
-                currentActiveParagonIndex = index;
-            }
-        });
-
-        listViewOnTouchListener = new View.OnTouchListener() {
-            private float fromPosition;
-
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                switch (motionEvent.getAction()) {
-                    case MotionEvent.ACTION_DOWN:
-                        fromPosition = motionEvent.getX();
-                        break;
-                    case MotionEvent.ACTION_UP:
-                        float delta = fromPosition - motionEvent.getX();
-                        float percentage = view.getMeasuredWidth() > view.getMeasuredHeight() ? 0.2f : 0.3f;
-
-                        if (Math.abs(delta) > view.getMeasuredWidth() * percentage)
-                            if (delta > 0)
-                                scrollFlipperView(1);
-                            else
-                                scrollFlipperView(-1);
-                        break;
-
-                    default:
-                        break;
-                }
-                return false;
-            }
-        };
         productIdKeyboardHandler = new ProductIdKeyboardHandler() {
             @Override
             public void onProductId(String productId) {
@@ -140,20 +95,6 @@ public class TabletActivity extends Activity implements TaskCallbacks {
                 addProduct(productId);
             }
         };
-    }
-
-
-    private int checkedRadioButtonIndex(RadioGroup group) {
-        return group.indexOfChild(group.findViewById(group.getCheckedRadioButtonId()));
-    }
-
-
-    private void scrollFlipperView(int direction) {
-        RadioGroup paragonGroup = cast(findViewById(R.id.paragon_group));
-        View radioBox = paragonGroup.getChildAt(checkedRadioButtonIndex(paragonGroup) + direction);
-
-        if (radioBox != null)
-            paragonGroup.check(radioBox.getId());
     }
 
 
@@ -176,32 +117,13 @@ public class TabletActivity extends Activity implements TaskCallbacks {
     }
 
     private void addProduct(ProductItem productItem) {
-        ProductViewLayout listView = getActiveView();
-
-        if (listView == null)
-            return;
-
-        productState.takeProduct(productItem);
-
-        listView.add(productItem);
-        listView.requestLayout();
+        if (paragonControlComponent.addProduct(productItem))
+            productState.takeProduct(productItem);
     }
 
+
     public ProductViewLayout createParagon(MenuItem menuItem) {
-        RadioGroup paragonGroup = cast(findViewById(R.id.paragon_group));
-
-        RadioButton currentRadio = new RadioButton(this);
-        paragonGroup.addView(currentRadio);
-
-        ViewFlipper flipper = cast(findViewById(R.id.listViewContainer));
-
-        ProductViewLayout productViewLayout = new ProductViewLayout(this, flipper);
-        productViewLayout.setViewOnTouchListener(listViewOnTouchListener);
-
-        flipper.addView(productViewLayout);
-        paragonGroup.check(currentRadio.getId());
-
-        return productViewLayout;
+        return paragonControlComponent.createParagon();
     }
 
     private void restoreState(ProductItem[] items) {
@@ -266,6 +188,7 @@ public class TabletActivity extends Activity implements TaskCallbacks {
     public void showSelectProductDialog(View view) {
         FragmentManager fm = getFragmentManager();
         ProductChoiceDialog dialog = (ProductChoiceDialog) fm.findFragmentByTag("ProductChoiceDialog");
+
         if (dialog == null) {
             dialog = new ProductChoiceDialog();
             dialog.setListener(new ProductChoiceDialog.ItemSelectListener() {
@@ -276,44 +199,20 @@ public class TabletActivity extends Activity implements TaskCallbacks {
             });
             dialog.show(fm, "ProductChoiceDialog");
         }
+
         dialog.setAvailableProductItem(productState.getCurrentState());
     }
 
     public void deleteProductItem(View view) {
-        ProductViewLayout viewLayout = getActiveView();
+        ProductItem item = paragonControlComponent.deleteProductItem();
 
-        if (viewLayout == null || viewLayout.getSelected() == null)
-            return;
-
-        ProductItem item = viewLayout.getSelected();
-        item.count--;
-
-
-
-        viewLayout.update(item);
+        if (item != null)
+            productState.returnBack(item, item.count);
     }
 
-    private ProductViewLayout getActiveView() {
-        RadioGroup paragonGroup = cast(findViewById(R.id.paragon_group));
-        int index = checkedRadioButtonIndex(paragonGroup);
-
-        if (index >= 0)
-            return cast(((ViewFlipper) findViewById(R.id.listViewContainer)).getChildAt(index));
-
-        return null;
-    }
 
     public void deleteParagon(MenuItem view) {
-        RadioGroup paragonGroup = cast(findViewById(R.id.paragon_group));
-        int index = checkedRadioButtonIndex(paragonGroup);
-        if (index >= 0) {
-            paragonGroup.removeViewAt(index);
-            ViewFlipper flipper = cast(findViewById(R.id.listViewContainer));
-            flipper.removeViewAt(index);
-
-            if (paragonGroup.getChildCount() != 0)
-                paragonGroup.check(paragonGroup.getChildAt(paragonGroup.getChildCount() == index ? 0 : index).getId());
-        }
+        paragonControlComponent.deleteParagon();
     }
 
     public void reloadAll(MenuItem view) {
@@ -361,6 +260,5 @@ public class TabletActivity extends Activity implements TaskCallbacks {
             productState.setBaseState((List<AvailableProductItem>) result);
 
     }
-
 }
 

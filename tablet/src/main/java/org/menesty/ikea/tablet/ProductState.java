@@ -90,4 +90,18 @@ public class ProductState {
             }
         }
     }
+
+    public void returnBack(ProductItem product, double count) {
+        String key = product.artNumber + "_" + product.price;
+        Double c = state.get(key);
+
+        if (c == null)
+            throw new RuntimeException("Product not found");
+
+        if (c - count == 0)
+            state.remove(key);
+        else
+            state.put(key, c - count);
+
+    }
 }
