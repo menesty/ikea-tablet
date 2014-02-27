@@ -60,15 +60,25 @@ public class ProductViewLayout extends LinearLayout {
         return getAdapter().getItems();
     }
 
+    private void selectViewItem(int index) {
+        ListView listView = (ListView) findViewById(R.id.product_view);
+        listView.setSelection(index);
+        listView.setItemChecked(index, true);
+    }
+
     public void add(ProductItem productItem) {
-        getAdapter().add(productItem);
+        ProductArrayAdapter adapter = getAdapter();
+        adapter.add(productItem);
+
+        if (adapter.getCount() == 1)
+            selectViewItem(selectedIndex = 0);
+
         updateInformation();
     }
 
     private ProductArrayAdapter getAdapter() {
         ListView listView = (ListView) findViewById(R.id.product_view);
-        ProductArrayAdapter adapter = (ProductArrayAdapter) listView.getAdapter();
-        return adapter;
+        return (ProductArrayAdapter) listView.getAdapter();
     }
 
     public ProductItem getSelected() {
@@ -110,12 +120,20 @@ public class ProductViewLayout extends LinearLayout {
     }
 
     public void update(ProductItem updateItem) {
+        ProductArrayAdapter adapter = getAdapter();
+        ProductItem selected = getSelected();
+
         for (ProductItem item : getAdapter().getItems()) {
             if (item.artNumber.equals(updateItem.artNumber)) {
                 if (updateItem.count <= 0) {
-                    if (item.equals(getSelected()))
-                        selectedIndex = -1;
-                    getAdapter().remove(item);
+                    adapter.remove(item);
+
+                    if (item.equals(selected))
+                        if (adapter.getCount() == 0)
+                            selectedIndex = -1;
+                        else
+                            selectViewItem(selectedIndex = 0);
+
                 } else
                     item.count = updateItem.count;
 
@@ -123,7 +141,5 @@ public class ProductViewLayout extends LinearLayout {
                 updateInformation();
             }
         }
-
-
     }
 }

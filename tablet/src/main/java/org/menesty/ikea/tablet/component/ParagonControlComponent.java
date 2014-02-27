@@ -10,11 +10,15 @@ import org.menesty.ikea.tablet.R;
 import org.menesty.ikea.tablet.domain.ProductItem;
 import org.menesty.ikea.tablet.listener.SlideListener;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by Menesty on 2/26/14.
  */
 public class ParagonControlComponent {
     private int currentActiveParagonIndex = 0;
+
     private Activity context;
 
     private View.OnTouchListener listViewOnTouchListener;
@@ -141,5 +145,17 @@ public class ParagonControlComponent {
             if (paragonGroup.getChildCount() != 0)
                 paragonGroup.check(paragonGroup.getChildAt(paragonGroup.getChildCount() == index ? 0 : index).getId());
         }
+    }
+
+    public List<ProductItem[]> getData(){
+        List<ProductItem[]> result = new ArrayList<ProductItem[]>();
+
+        ViewFlipper flipper = (ViewFlipper)(context.findViewById(R.id.listViewContainer));
+
+        for (int i = 0; i < flipper.getChildCount(); i++)
+            if (flipper.getChildAt(i) instanceof ProductViewLayout)
+                result.add(((ProductViewLayout) flipper.getChildAt(i)).getItems());
+
+        return result;
     }
 }

@@ -1,7 +1,7 @@
 package org.menesty.ikea.tablet.task;
 
 import org.menesty.ikea.tablet.auth.AuthService;
-import org.menesty.ikea.tablet.data.DataLoader;
+import org.menesty.ikea.tablet.data.DataJsonService;
 import org.menesty.ikea.tablet.domain.AvailableProductItem;
 
 import java.io.IOException;
@@ -44,7 +44,7 @@ public class LoadServerDataTask extends BaseAsyncTask<Object, Integer, List<Avai
             input = connection.getInputStream();
             onProgressUpdate(100);
 
-            return new DataLoader().readJsonStream(input);
+            return new DataJsonService().parseProducts(input);
         } catch (Exception e) {
             e.printStackTrace();
             return null;

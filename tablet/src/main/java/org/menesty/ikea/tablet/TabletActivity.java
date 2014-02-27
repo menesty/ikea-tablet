@@ -12,10 +12,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
-import android.widget.ViewFlipper;
-import org.menesty.ikea.tablet.autoupdate.AutoUpdateApk;
 import org.menesty.ikea.tablet.component.ParagonControlComponent;
 import org.menesty.ikea.tablet.component.ProductViewLayout;
+import org.menesty.ikea.tablet.data.DataJsonService;
 import org.menesty.ikea.tablet.dialog.ProductChoiceDialog;
 import org.menesty.ikea.tablet.domain.AvailableProductItem;
 import org.menesty.ikea.tablet.domain.ProductItem;
@@ -24,11 +23,10 @@ import org.menesty.ikea.tablet.task.LoadServerDataTask;
 import org.menesty.ikea.tablet.task.TaskCallbacks;
 import org.menesty.ikea.tablet.util.TaskFragment;
 
+import java.io.IOException;
 import java.util.List;
 
 public class TabletActivity extends Activity implements TaskCallbacks {
-
-    private int currentActiveParagonIndex = 0;
 
     private static volatile ProgressDialog mProgressDialog;
 
@@ -62,7 +60,7 @@ public class TabletActivity extends Activity implements TaskCallbacks {
             loadDataFromServer();
         }
 
-        new AutoUpdateApk(getApplicationContext());
+        //new AutoUpdateApk(getApplicationContext());
 
     }
 
@@ -113,7 +111,6 @@ public class TabletActivity extends Activity implements TaskCallbacks {
         }
 
         addProduct(product);
-
     }
 
     private void addProduct(ProductItem productItem) {
@@ -126,6 +123,12 @@ public class TabletActivity extends Activity implements TaskCallbacks {
         return paragonControlComponent.createParagon();
     }
 
+    public void sendToServer(MenuItem menuItem) throws IOException {
+        DataJsonService service = new DataJsonService();
+        String result = service.serializeParagons(paragonControlComponent.getData());
+        System.out.println(result);
+    }
+
     private void restoreState(ProductItem[] items) {
         ProductViewLayout listView = createParagon(null);
         listView.setItems(items);
@@ -135,19 +138,14 @@ public class TabletActivity extends Activity implements TaskCallbacks {
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
-        ViewFlipper flipper = cast(findViewById(R.id.listViewContainer));
-        int viewCount = 0;
-        for (int i = 0; i < flipper.getChildCount(); i++)
-            if (flipper.getChildAt(i) instanceof ProductViewLayout) {
-                ProductViewLayout listView = cast(flipper.getChildAt(i));
-                outState.putParcelableArray("view_" + viewCount, listView.getItems());
-                viewCount++;
-            }
+        List<ProductItem[]> data = paragonControlComponent.getData();
 
-        outState.putInt("viewCount", viewCount);
+        for (int i = 0; i < data.size(); i++)
+            outState.putParcelableArray("view_" + i, data.get(i));
+
+        outState.putInt("viewCount", data.size());
         outState.putParcelableArray("product_base_state", productState.getBaseState());
         outState.putStringArray("product_state", productState.getState());
-
 
         if (mProgressDialog != null)
             mProgressDialog.dismiss();
@@ -166,10 +164,8 @@ public class TabletActivity extends Activity implements TaskCallbacks {
 
         TaskFragment mTaskFragment = (TaskFragment) getFragmentManager().findFragmentByTag("task");
 
-
         if (mTaskFragment != null && mTaskFragment.isRunning())
             mProgressDialog = ProgressDialog.show(this, "", getResources().getString(R.string.load_data_from_server), true);
-
 
         ProductChoiceDialog dialog = (ProductChoiceDialog) getFragmentManager().findFragmentByTag("ProductChoiceDialog");
 
@@ -182,7 +178,6 @@ public class TabletActivity extends Activity implements TaskCallbacks {
                 }
             });
         }
-
     }
 
     public void showSelectProductDialog(View view) {
@@ -207,7 +202,7 @@ public class TabletActivity extends Activity implements TaskCallbacks {
         ProductItem item = paragonControlComponent.deleteProductItem();
 
         if (item != null)
-            productState.returnBack(item, item.count);
+            productState.returnBack(item, 1);
     }
 
 
