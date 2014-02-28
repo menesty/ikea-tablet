@@ -95,7 +95,7 @@ public class DataJsonService {
                 for (ProductItem item : data.get(i)) {
                     writer.beginObject();
                     writer.name("paragonId").value(i);
-                    writer.name("userId").value(1);
+                    writer.name("userId").value(i);
                     writer.name("items");
 
                     writer.beginArray();
@@ -112,14 +112,9 @@ public class DataJsonService {
                 }
 
             }
-
-
             writer.endArray();
 
-
             writer.endObject();
-
-
             writer.close();
         } catch (IOException e) {
             e.printStackTrace();

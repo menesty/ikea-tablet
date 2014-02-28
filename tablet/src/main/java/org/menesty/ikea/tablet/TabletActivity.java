@@ -21,6 +21,7 @@ import org.menesty.ikea.tablet.domain.ProductItem;
 import org.menesty.ikea.tablet.task.BaseAsyncTask;
 import org.menesty.ikea.tablet.task.LoadServerDataTask;
 import org.menesty.ikea.tablet.task.TaskCallbacks;
+import org.menesty.ikea.tablet.task.UploadDataTask;
 import org.menesty.ikea.tablet.util.TaskFragment;
 
 import java.io.IOException;
@@ -126,6 +127,18 @@ public class TabletActivity extends Activity implements TaskCallbacks {
     public void sendToServer(MenuItem menuItem) throws IOException {
         DataJsonService service = new DataJsonService();
         String result = service.serializeParagons(paragonControlComponent.getData());
+
+        mProgressDialog = ProgressDialog.show(this, "", getResources().getString(R.string.load_data_from_server), true);
+
+        TaskFragment mTaskFragment = (TaskFragment) getFragmentManager().findFragmentByTag("task-upload");
+        if (mTaskFragment == null) {
+            mTaskFragment = new TaskFragment(this);
+        }
+        if(!mTaskFragment.isRunning()) {
+            mTaskFragment.start(new UploadDataTask(), Config.getServerUrl(), Config.getUser(), Config.getPassword(), result);
+            getFragmentManager().beginTransaction().add(mTaskFragment, "task-upload").commit();
+        }
+
         System.out.println(result);
     }
 

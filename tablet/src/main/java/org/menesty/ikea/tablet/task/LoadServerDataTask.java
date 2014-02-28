@@ -17,26 +17,17 @@ public class LoadServerDataTask extends BaseAsyncTask<Object, Integer, List<Avai
     protected List<AvailableProductItem> doInBackground(Object... data) {
         InputStream input = null;
         HttpURLConnection connection = null;
+        String desUrl = data[0] + "/storage/load";
 
+        AuthService authService = new AuthService();
         try {
-            URL url = new URL(data[0] + "/storage/load");
+            URL url = new URL(desUrl);
             connection = (HttpURLConnection) url.openConnection();
+
+            String authHeader = authService.authHeader(desUrl, (String) data[1], (String) data[2], "GET");
+            connection.setRequestProperty("Authorization", authHeader);
+
             connection.connect();
-            if (connection.getResponseCode() == HttpURLConnection.HTTP_UNAUTHORIZED) {
-                String wwwAuthHeader = connection.getHeaderField("Www-Authenticate");
-
-                if (wwwAuthHeader != null && wwwAuthHeader.contains("Digest")) {
-                    AuthService authService = new AuthService();
-
-                    String authHeader = authService.generateAuthHeader(wwwAuthHeader, (String) data[1], (String) data[2], "GET", url.getPath());
-
-                    connection = (HttpURLConnection) url.openConnection();
-                    connection.setRequestProperty("Authorization", authHeader);
-
-                    connection.connect();
-                }
-
-            }
 
             if (connection.getResponseCode() != HttpURLConnection.HTTP_OK)
                 return null;

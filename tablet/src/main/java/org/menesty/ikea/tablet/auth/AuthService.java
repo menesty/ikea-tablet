@@ -1,11 +1,29 @@
 package org.menesty.ikea.tablet.auth;
 
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.security.MessageDigest;
 import java.util.HashMap;
 import java.util.Random;
 
 public class AuthService {
 
+    public String authHeader(String desUrl, String user, String password, String method) throws Exception {
+        String authHeader = "";
+
+        URL url = new URL(desUrl);
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.connect();
+        if (connection.getResponseCode() == HttpURLConnection.HTTP_UNAUTHORIZED) {
+            String wwwAuthHeader = connection.getHeaderField("Www-Authenticate");
+
+            if (wwwAuthHeader != null && wwwAuthHeader.contains("Digest"))
+                authHeader = generateAuthHeader(wwwAuthHeader, user, password, method, url.getPath());
+        } else
+            authHeader = connection.getRequestProperty("Authorization");
+
+        return authHeader;
+    }
 
     public String generateAuthHeader(String wwwAuth, String user, String pass, String httpMethod, String uri) throws Exception {
         String data = wwwAuth.substring(wwwAuth.indexOf(" ") + 1);
@@ -17,7 +35,6 @@ public class AuthService {
         String realm = x.get("realm");
         String A1 = encrypt(digest, user + ":" + realm + ":" + pass);
         String A2 = encrypt(digest, httpMethod + ":" + uri);
-
 
         String cnonce = Integer.toString(Math.abs(new Random().nextInt()));
         String ncvalue = "00000001";
@@ -69,7 +86,6 @@ public class AuthService {
         byte[] txtBytes = txt.getBytes();
         byte[] hashedBytes = new byte[16];
         digest.update(txtBytes, 0, txtBytes.length);
-
 
         int bytesNum = digest.digest(hashedBytes, 0, hashedBytes.length);
         StringBuffer hexString = new StringBuffer();
