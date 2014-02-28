@@ -65,17 +65,6 @@ public class TabletActivity extends Activity implements TaskCallbacks {
 
     }
 
-    private void loadDataFromServer() {
-        mProgressDialog = ProgressDialog.show(this, "", getResources().getString(R.string.load_data_from_server), true);
-
-        TaskFragment mTaskFragment = (TaskFragment) getFragmentManager().findFragmentByTag("task");
-        if (mTaskFragment == null) {
-            mTaskFragment = new TaskFragment(this);
-            mTaskFragment.start(new LoadServerDataTask(), Config.getServerUrl(), Config.getUser(), Config.getPassword());
-            getFragmentManager().beginTransaction().add(mTaskFragment, "task").commit();
-        }
-
-    }
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
@@ -131,15 +120,31 @@ public class TabletActivity extends Activity implements TaskCallbacks {
         mProgressDialog = ProgressDialog.show(this, "", getResources().getString(R.string.load_data_from_server), true);
 
         TaskFragment mTaskFragment = (TaskFragment) getFragmentManager().findFragmentByTag("task-upload");
-        if (mTaskFragment == null) {
+
+        if (mTaskFragment == null)
             mTaskFragment = new TaskFragment(this);
-        }
+
         if(!mTaskFragment.isRunning()) {
             mTaskFragment.start(new UploadDataTask(), Config.getServerUrl(), Config.getUser(), Config.getPassword(), result);
             getFragmentManager().beginTransaction().add(mTaskFragment, "task-upload").commit();
         }
 
         System.out.println(result);
+    }
+
+    private void loadDataFromServer() {
+        mProgressDialog = ProgressDialog.show(this, "", getResources().getString(R.string.load_data_from_server), true);
+
+        TaskFragment mTaskFragment = (TaskFragment) getFragmentManager().findFragmentByTag("task");
+
+        if (mTaskFragment == null)
+            mTaskFragment = new TaskFragment(this);
+
+        if(!mTaskFragment.isRunning()) {
+            mTaskFragment.start(new LoadServerDataTask(), Config.getServerUrl(), Config.getUser(), Config.getPassword());
+            getFragmentManager().beginTransaction().add(mTaskFragment, "task").commit();
+        }
+
     }
 
     private void restoreState(ProductItem[] items) {

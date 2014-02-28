@@ -13,7 +13,9 @@ public class AuthService {
 
         URL url = new URL(desUrl);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod(method);
         connection.connect();
+
         if (connection.getResponseCode() == HttpURLConnection.HTTP_UNAUTHORIZED) {
             String wwwAuthHeader = connection.getHeaderField("Www-Authenticate");
 
@@ -22,6 +24,7 @@ public class AuthService {
         } else
             authHeader = connection.getRequestProperty("Authorization");
 
+        connection.disconnect();
         return authHeader;
     }
 

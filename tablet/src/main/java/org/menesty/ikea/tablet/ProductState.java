@@ -28,7 +28,7 @@ public class ProductState {
                 count = count == null ? 0 : count;
 
                 if (count == 0 || count < productItem.count)
-                    productItems.add(new ProductItem(productItem.productId, productItem.productName, productItem.count - count, productItem.price, productItem.weight));
+                    productItems.add(new ProductItem(productItem.productId, productItem.productName, productItem.count - count, productItem.price, productItem.weight, productItem.orderId));
             }
         }
         return productItems.toArray(new ProductItem[0]);
@@ -42,7 +42,7 @@ public class ProductState {
                 count = count == null ? 0 : count;
 
                 if (count == 0 || count < productItem.count)
-                    return new ProductItem(productItem.productId, productItem.productName, productItem.count - count, productItem.price, productItem.weight);
+                    return new ProductItem(productItem.productId, productItem.productName, productItem.count - count, productItem.price, productItem.weight, productItem.orderId);
 
                 return null;
             }
@@ -81,7 +81,7 @@ public class ProductState {
         reset();
         for (String state : states) {
             String[] parts = state.split("|");
-            Double count = 0d;
+            Double count;
             try {
                 count = Double.valueOf(parts[1]);
                 this.state.put(parts[0], count);
