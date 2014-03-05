@@ -2,4 +2,6 @@
 <resources>
     <string name="app_name">ikea-tablet</string>
     <string name="load_data_from_server">Load data from server ...</string>
+    <string name="reloadData">Try load data</string>
+    <string name="reloadDataInfo">You have not connection to internet, connect wifi or mobile internet and try again.</string>
 </resources>

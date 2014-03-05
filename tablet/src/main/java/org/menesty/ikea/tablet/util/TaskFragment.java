@@ -1,13 +1,13 @@
 package org.menesty.ikea.tablet.util;
 
-import android.app.Activity;
-import android.app.Fragment;
+import android.app.*;
 import android.os.Bundle;
+import org.menesty.ikea.tablet.R;
 import org.menesty.ikea.tablet.task.BaseAsyncTask;
 import org.menesty.ikea.tablet.task.TaskCallbacks;
 import org.menesty.ikea.tablet.task.TaskStatusListener;
 
-public class TaskFragment extends Fragment {
+public class TaskFragment extends DialogFragment {
 
     private BaseAsyncTask<?, ?, ?> task;
 
@@ -20,6 +20,15 @@ public class TaskFragment extends Fragment {
         this.callbacks = callbacks;
 
     }
+
+    @Override
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
+        ProgressDialog dialog = new ProgressDialog(getActivity());
+        dialog.setMessage(getResources().getString(R.string.load_data_from_server));
+
+        return dialog;
+    }
+
 
     @Override
     public void onAttach(Activity activity) {

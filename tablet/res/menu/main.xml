@@ -13,12 +13,8 @@
             android:showAsAction="always|withText"
             android:onClick="deleteParagon"/>
     <item
-            android:id="@+id/reload_all"
-            android:icon="@drawable/ic_action_refresh"
-            android:showAsAction="always"
-            android:onClick="reloadAll"/>
-    <item
             android:id="@+id/send_product"
             android:icon="@drawable/ic_action_send_now"
+            android:showAsAction="always"
             android:onClick="sendToServer" />
 </menu>

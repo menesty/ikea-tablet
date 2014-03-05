@@ -2,8 +2,9 @@ package org.menesty.ikea.tablet;
 
 import android.app.Activity;
 import android.app.FragmentManager;
-import android.app.ProgressDialog;
 import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.PowerManager;
 import android.util.Log;
@@ -15,6 +16,7 @@ import android.widget.Toast;
 import org.menesty.ikea.tablet.component.ParagonControlComponent;
 import org.menesty.ikea.tablet.component.ProductViewLayout;
 import org.menesty.ikea.tablet.data.DataJsonService;
+import org.menesty.ikea.tablet.dialog.InternetConnectionDialog;
 import org.menesty.ikea.tablet.dialog.ProductChoiceDialog;
 import org.menesty.ikea.tablet.domain.AvailableProductItem;
 import org.menesty.ikea.tablet.domain.ProductItem;
@@ -27,18 +29,21 @@ import org.menesty.ikea.tablet.util.TaskFragment;
 import java.io.IOException;
 import java.util.List;
 
-public class TabletActivity extends Activity implements TaskCallbacks {
-
-    private static volatile ProgressDialog mProgressDialog;
+public class TabletActivity extends Activity implements TaskCallbacks, LoadDataListener {
 
     private ProductIdKeyboardHandler productIdKeyboardHandler;
-
 
     private ProductState productState = new ProductState();
 
     private ParagonControlComponent paragonControlComponent;
 
     private static TabletActivity instance;
+
+    private static final int DATA_LOADING = 1;
+
+    private static final int DATA_LOADED = 2;
+
+    private int dataLoadState;
 
     public TabletActivity() {
         instance = this;
@@ -58,22 +63,42 @@ public class TabletActivity extends Activity implements TaskCallbacks {
 
         if (savedInstanceState == null) {
             createParagon(null);
-            loadDataFromServer();
         }
 
+        if (dataLoadState == 0) {
+            //check if connection present
+            loadData();
+        }
         //new AutoUpdateApk(getApplicationContext());
 
     }
 
-    private void loadDataFromServer() {
-        mProgressDialog = ProgressDialog.show(this, "", getResources().getString(R.string.load_data_from_server), true);
+    @Override
+    public void loadData() {
+        ConnectivityManager cm =
+                (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        boolean isConnected = activeNetwork != null &&
+                activeNetwork.isConnectedOrConnecting();
 
-        TaskFragment mTaskFragment = (TaskFragment) getFragmentManager().findFragmentByTag("task");
-        if (mTaskFragment == null) {
-            mTaskFragment = new TaskFragment(this);
-            mTaskFragment.start(new LoadServerDataTask(), Config.getServerUrl(), Config.getUser(), Config.getPassword());
-            getFragmentManager().beginTransaction().add(mTaskFragment, "task").commit();
+        if (isConnected) {
+            TaskFragment mTaskFragment = (TaskFragment) getFragmentManager().findFragmentByTag("task");
+            if (mTaskFragment == null) {
+                dataLoadState = DATA_LOADING;
+                mTaskFragment = new TaskFragment(this);
+                mTaskFragment.start(new LoadServerDataTask(), Config.getServerUrl(), Config.getUser(), Config.getPassword());
+                getFragmentManager().beginTransaction().add(mTaskFragment, "task").commit();
+            }
+
+        } else {
+            InternetConnectionDialog internetConnectionDialog = cast(getFragmentManager().findFragmentByTag("internetConnectionDialog"));
+
+            if (internetConnectionDialog == null)
+                internetConnectionDialog = new InternetConnectionDialog();
+
+            getFragmentManager().beginTransaction().add(internetConnectionDialog, "internetConnectionDialog").commit();
         }
+
 
     }
 
@@ -128,13 +153,12 @@ public class TabletActivity extends Activity implements TaskCallbacks {
         DataJsonService service = new DataJsonService();
         String result = service.serializeParagons(paragonControlComponent.getData());
 
-        mProgressDialog = ProgressDialog.show(this, "", getResources().getString(R.string.load_data_from_server), true);
-
         TaskFragment mTaskFragment = (TaskFragment) getFragmentManager().findFragmentByTag("task-upload");
-        if (mTaskFragment == null) {
+
+        if (mTaskFragment == null)
             mTaskFragment = new TaskFragment(this);
-        }
-        if(!mTaskFragment.isRunning()) {
+
+        if (!mTaskFragment.isRunning()) {
             mTaskFragment.start(new UploadDataTask(), Config.getServerUrl(), Config.getUser(), Config.getPassword(), result);
             getFragmentManager().beginTransaction().add(mTaskFragment, "task-upload").commit();
         }
@@ -159,9 +183,7 @@ public class TabletActivity extends Activity implements TaskCallbacks {
         outState.putInt("viewCount", data.size());
         outState.putParcelableArray("product_base_state", productState.getBaseState());
         outState.putStringArray("product_state", productState.getState());
-
-        if (mProgressDialog != null)
-            mProgressDialog.dismiss();
+        outState.putInt("loadDataState", dataLoadState);
 
         productIdKeyboardHandler.cancel();
     }
@@ -177,9 +199,6 @@ public class TabletActivity extends Activity implements TaskCallbacks {
 
         TaskFragment mTaskFragment = (TaskFragment) getFragmentManager().findFragmentByTag("task");
 
-        if (mTaskFragment != null && mTaskFragment.isRunning())
-            mProgressDialog = ProgressDialog.show(this, "", getResources().getString(R.string.load_data_from_server), true);
-
         ProductChoiceDialog dialog = (ProductChoiceDialog) getFragmentManager().findFragmentByTag("ProductChoiceDialog");
 
         if (dialog != null) {
@@ -191,6 +210,8 @@ public class TabletActivity extends Activity implements TaskCallbacks {
                 }
             });
         }
+
+        dataLoadState = savedInstanceState.getInt("loadDataState");
     }
 
     public void showSelectProductDialog(View view) {
@@ -224,7 +245,7 @@ public class TabletActivity extends Activity implements TaskCallbacks {
     }
 
     public void reloadAll(MenuItem view) {
-        loadDataFromServer();
+        loadData();
     }
 
     private <T> T cast(Object view) {
@@ -238,7 +259,6 @@ public class TabletActivity extends Activity implements TaskCallbacks {
                 getClass().getName());
         wl.acquire();
 
-        mProgressDialog.show();
     }
 
     @Override
@@ -248,14 +268,10 @@ public class TabletActivity extends Activity implements TaskCallbacks {
 
     @Override
     public void onCancelled() {
-        mProgressDialog.setProgress(0);
-        mProgressDialog.dismiss();
     }
 
     @Override
     public void onPostExecute(BaseAsyncTask task, Object result) {
-        mProgressDialog.dismiss();
-        mProgressDialog = null;
 
         PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
         PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
@@ -264,8 +280,14 @@ public class TabletActivity extends Activity implements TaskCallbacks {
         if (wl.isHeld())
             wl.release();
 
-        if (task instanceof LoadServerDataTask)
-            productState.setBaseState((List<AvailableProductItem>) result);
+        if (task instanceof LoadServerDataTask) {
+            List<AvailableProductItem> data = (List<AvailableProductItem>) result;
+            if (data != null) {
+                productState.setBaseState((List<AvailableProductItem>) result);
+                dataLoadState = DATA_LOADED;
+            } else
+                loadData();
+        }
 
     }
 }

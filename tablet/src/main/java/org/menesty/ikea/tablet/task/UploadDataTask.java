@@ -3,8 +3,6 @@ package org.menesty.ikea.tablet.task;
 import org.menesty.ikea.tablet.auth.AuthService;
 
 import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
@@ -47,15 +45,6 @@ public class UploadDataTask extends BaseAsyncTask<Object, Integer, Void> {
             }
             br.close();
             java.lang.String responseString = sb.toString();
-
-            /*connection.connect();
-
-            if (connection.getResponseCode() == HttpURLConnection.HTTP_UNAUTHORIZED) {
-                System.out.println("kjsd");
-            } else {
-                System.out.println("kjsd");
-
-            }*/
 
         } catch (Exception e) {
             e.printStackTrace();
