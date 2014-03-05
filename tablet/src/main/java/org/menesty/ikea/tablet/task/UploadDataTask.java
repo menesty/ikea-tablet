@@ -44,24 +44,18 @@ public class UploadDataTask extends BaseAsyncTask<Object, Integer, Void> {
             HttpContext credContext = new BasicHttpContext();
             credContext.setAttribute(ClientContext.CREDS_PROVIDER, cp);
 
-            java.io.BufferedReader br = new java.io.BufferedReader(new java.io.InputStreamReader(connection.getInputStream()));
-            java.lang.StringBuffer sb = new java.lang.StringBuffer();
-            java.lang.String str = br.readLine();
-            while(str != null){
-                sb.append(str);
-                str = br.readLine();
-            }
-            br.close();
-            java.lang.String responseString = sb.toString();
+            HttpPost httpPost = new HttpPost(desUrl);
+            httpPost.setEntity(se);
 
-            /*connection.connect();
+            httpPost.setHeader("Accept", "application/json");
+            httpPost.setHeader("Content-type", "application/json");
+            httpPost.setHeader("Authorization", authHeader);
 
-            if (connection.getResponseCode() == HttpURLConnection.HTTP_UNAUTHORIZED) {
-                System.out.println("kjsd");
-            } else {
-                System.out.println("kjsd");
+            HttpResponse httpResponse = httpclient.execute(httpPost, credContext);
 
-            }*/
+            InputStream inputStream = httpResponse.getEntity().getContent();
+            String result = convertInputStreamToString(inputStream);
+            System.out.println(result);
 
 
         } catch (Exception e) {

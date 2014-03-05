@@ -166,21 +166,6 @@ public class TabletActivity extends Activity implements TaskCallbacks, LoadDataL
         System.out.println(result);
     }
 
-    private void loadDataFromServer() {
-        mProgressDialog = ProgressDialog.show(this, "", getResources().getString(R.string.load_data_from_server), true);
-
-        TaskFragment mTaskFragment = (TaskFragment) getFragmentManager().findFragmentByTag("task");
-
-        if (mTaskFragment == null)
-            mTaskFragment = new TaskFragment(this);
-
-        if(!mTaskFragment.isRunning()) {
-            mTaskFragment.start(new LoadServerDataTask(), Config.getServerUrl(), Config.getUser(), Config.getPassword());
-            getFragmentManager().beginTransaction().add(mTaskFragment, "task").commit();
-        }
-
-    }
-
     private void restoreState(ProductItem[] items) {
         ProductViewLayout listView = createParagon(null);
         listView.setItems(items);
