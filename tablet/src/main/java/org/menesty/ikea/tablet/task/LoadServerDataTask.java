@@ -11,8 +11,6 @@ import java.net.URL;
 import java.util.List;
 
 public class LoadServerDataTask extends BaseAsyncTask<Object, Integer, List<AvailableProductItem>> {
-
-
     @Override
     protected List<AvailableProductItem> doInBackground(Object... data) {
         InputStream input = null;
