@@ -11,6 +11,7 @@ import java.net.URL;
 import java.util.List;
 
 public class LoadServerDataTask extends BaseAsyncTask<Object, Integer, List<AvailableProductItem>> {
+
     @Override
     protected List<AvailableProductItem> doInBackground(Object... data) {
         InputStream input = null;
@@ -49,26 +50,4 @@ public class LoadServerDataTask extends BaseAsyncTask<Object, Integer, List<Avai
         }
     }
 
-    @Override
-    protected void onPreExecute() {
-        callbacks.onPreExecute();
-        setRunning(true);
-    }
-
-    @Override
-    protected void onProgressUpdate(Integer... percent) {
-        callbacks.onProgressUpdate(percent[0]);
-    }
-
-    @Override
-    protected void onCancelled() {
-        callbacks.onCancelled();
-        setRunning(false);
-    }
-
-    @Override
-    protected void onPostExecute(List<AvailableProductItem> result) {
-        callbacks.onPostExecute(this, result);
-        setRunning(false);
-    }
 }

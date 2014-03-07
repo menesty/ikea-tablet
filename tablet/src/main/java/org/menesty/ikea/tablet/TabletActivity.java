@@ -78,16 +78,16 @@ public class TabletActivity extends Activity implements TaskCallbacks, LoadDataL
         ConnectivityManager cm =
                 (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-        boolean isConnected = activeNetwork != null &&
-                activeNetwork.isConnectedOrConnecting();
+        boolean isConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting();
 
-        if (isConnected) {
-            TaskFragment mTaskFragment = (TaskFragment) getFragmentManager().findFragmentByTag("task");
+        if (isConnected && dataLoadState == 0) {
+            TaskFragment<List<AvailableProductItem>> mTaskFragment = cast(getFragmentManager().findFragmentByTag("task"));
+
             if (mTaskFragment == null) {
                 dataLoadState = DATA_LOADING;
-                mTaskFragment = new TaskFragment(this);
-                mTaskFragment.start(new LoadServerDataTask(), Config.getServerUrl(), Config.getUser(), Config.getPassword());
+                mTaskFragment = new TaskFragment<List<AvailableProductItem>>();
                 getFragmentManager().beginTransaction().add(mTaskFragment, "task").commit();
+                mTaskFragment.start(new LoadServerDataTask(), Config.getServerUrl(), Config.getUser(), Config.getPassword());
             }
 
         } else {
@@ -153,10 +153,10 @@ public class TabletActivity extends Activity implements TaskCallbacks, LoadDataL
         DataJsonService service = new DataJsonService();
         String result = service.serializeParagons(paragonControlComponent.getData());
 
-        TaskFragment mTaskFragment = (TaskFragment) getFragmentManager().findFragmentByTag("task-upload");
+        TaskFragment<Void> mTaskFragment = cast(getFragmentManager().findFragmentByTag("task-upload"));
 
         if (mTaskFragment == null)
-            mTaskFragment = new TaskFragment(this);
+            mTaskFragment = new TaskFragment<Void>();
 
         if (!mTaskFragment.isRunning()) {
             mTaskFragment.start(new UploadDataTask(), Config.getServerUrl(), Config.getUser(), Config.getPassword(), result);
@@ -196,8 +196,6 @@ public class TabletActivity extends Activity implements TaskCallbacks, LoadDataL
 
         productState.setBaseState(this.<AvailableProductItem[]>cast(savedInstanceState.getParcelableArray("product_base_state")));
         productState.setState(savedInstanceState.getStringArray("product_state"));
-
-        TaskFragment mTaskFragment = (TaskFragment) getFragmentManager().findFragmentByTag("task");
 
         ProductChoiceDialog dialog = (ProductChoiceDialog) getFragmentManager().findFragmentByTag("ProductChoiceDialog");
 
@@ -244,10 +242,7 @@ public class TabletActivity extends Activity implements TaskCallbacks, LoadDataL
         paragonControlComponent.deleteParagon();
     }
 
-    public void reloadAll(MenuItem view) {
-        loadData();
-    }
-
+    @SuppressWarnings("unchecked")
     private <T> T cast(Object view) {
         return (T) view;
     }
@@ -281,9 +276,10 @@ public class TabletActivity extends Activity implements TaskCallbacks, LoadDataL
             wl.release();
 
         if (task instanceof LoadServerDataTask) {
-            List<AvailableProductItem> data = (List<AvailableProductItem>) result;
+            List<AvailableProductItem> data = cast(result);
+
             if (data != null) {
-                productState.setBaseState((List<AvailableProductItem>) result);
+                productState.setBaseState(data);
                 dataLoadState = DATA_LOADED;
             } else
                 loadData();

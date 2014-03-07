@@ -1,44 +1,44 @@
 package org.menesty.ikea.tablet.util;
 
-import android.app.*;
+import android.app.Fragment;
+import android.app.ProgressDialog;
+import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
 import android.os.Bundle;
-import org.menesty.ikea.tablet.R;
 import org.menesty.ikea.tablet.task.BaseAsyncTask;
 import org.menesty.ikea.tablet.task.TaskCallbacks;
-import org.menesty.ikea.tablet.task.TaskStatusListener;
+import org.menesty.ikea.tablet.task.TaskListener;
 
-public class TaskFragment extends DialogFragment {
+public class TaskFragment<Result> extends Fragment implements TaskListener<Result> {
 
-    private BaseAsyncTask<?, ?, ?> task;
+    private BaseAsyncTask<?, ?, Result> task;
+
+    private ProgressDialog progressDialog;
+
+    private boolean isTaskRunning = false;
+
+    private boolean showDialog;
+
+    private boolean lockScreen;
 
 
-    private TaskCallbacks callbacks;
+    public TaskFragment(boolean showDialog, boolean lockScreen) {
+        this.showDialog = showDialog;
+        this.lockScreen = lockScreen;
+    }
 
-    private boolean mRunning;
-
-    public TaskFragment(TaskCallbacks callbacks) {
-        this.callbacks = callbacks;
-
+    public TaskFragment() {
+        this(true, false);
     }
 
     @Override
-    public Dialog onCreateDialog(Bundle savedInstanceState) {
-        ProgressDialog dialog = new ProgressDialog(getActivity());
-        dialog.setMessage(getResources().getString(R.string.load_data_from_server));
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
 
-        return dialog;
+        if (showDialog && isTaskRunning)
+            showDialog();
     }
 
-
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        if (!(activity instanceof TaskCallbacks)) {
-            throw new IllegalStateException("Activity must implement the TaskCallbacks interface.");
-        }
-
-        callbacks = (TaskCallbacks) activity;
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -46,37 +46,67 @@ public class TaskFragment extends DialogFragment {
         setRetainInstance(true);
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        cancel();
-    }
-
-    public void start(BaseAsyncTask<?, ?, ?> task, Object... params) {
-        if (!mRunning) {
+    public void start(BaseAsyncTask<?, ?, Result> task, Object... params) {
+        if (!isTaskRunning) {
             this.task = task;
-            task.setStatusListener(new TaskStatusListener() {
-                @Override
-                public void setRunning(boolean value) {
-                    mRunning = value;
-                }
-            });
-            task.setTaskCallbacks(callbacks);
+            task.setTaskListener(this);
             task.execute(params);
-
-            mRunning = true;
         }
     }
 
-    public void cancel() {
-        if (mRunning) {
-            task.cancel(false);
-            task = null;
-            mRunning = false;
-        }
+    @Override
+    public void onTaskStarted() {
+        isTaskRunning = true;
+
+        if (showDialog)
+            showDialog();
+
+        if (lockScreen)
+            lockScreenOrientation();
+    }
+
+    private void showDialog() {
+        progressDialog = ProgressDialog.show(getActivity(), "Loading", "Please wait a moment!");
+    }
+
+    @Override
+    public void onTaskFinished(Result result) {
+        if (progressDialog != null)
+            progressDialog.dismiss();
+
+        if (lockScreen)
+            unlockScreenOrientation();
+
+        isTaskRunning = false;
+
+        ((TaskCallbacks) getActivity()).onPostExecute(task, result);
+    }
+
+    @Override
+    public void onDetach() {
+        // All dialogs should be closed before leaving the activity in order to avoid
+        // the: Activity has leaked window com.android.internal.policy... exception
+        if (progressDialog != null && progressDialog.isShowing())
+            progressDialog.dismiss();
+
+        super.onDetach();
+    }
+
+    private void lockScreenOrientation() {
+        int currentOrientation = getResources().getConfiguration().orientation;
+
+        if (currentOrientation == Configuration.ORIENTATION_PORTRAIT)
+            getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        else
+            getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+
+    }
+
+    private void unlockScreenOrientation() {
+        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
     }
 
     public boolean isRunning() {
-        return mRunning;
+        return isTaskRunning;
     }
 }

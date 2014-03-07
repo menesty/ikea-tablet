@@ -3,29 +3,22 @@ package org.menesty.ikea.tablet.task;
 import android.os.AsyncTask;
 
 public abstract class BaseAsyncTask<Params, Progress, Result> extends AsyncTask<Params, Progress, Result> {
-    private TaskStatusListener statusListener;
 
-    protected TaskCallbacks callbacks;
+    private TaskListener<Result> listener;
 
-    public void setStatusListener(TaskStatusListener statusListener) {
-        this.statusListener = statusListener;
+    public void setTaskListener(TaskListener<Result> listener) {
+        this.listener = listener;
     }
 
-    public void setTaskCallbacks(TaskCallbacks callbacks) {
-        this.callbacks = callbacks;
-    }
-
-    protected void setRunning(boolean value) {
-        if (statusListener != null)
-            statusListener.setRunning(value);
+    @Override
+    protected void onPreExecute() {
+        if (listener != null)
+            listener.onTaskStarted();
     }
 
     @Override
     protected void onPostExecute(Result result) {
-        if (callbacks != null)
-            callbacks.onPostExecute(this, result);
-
-        if (statusListener != null)
-            statusListener.setRunning(false);
+        if (listener != null)
+            listener.onTaskFinished(result);
     }
 }
