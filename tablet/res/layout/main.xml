@@ -70,6 +70,7 @@
                 android:layout_height="match_parent"
                 android:background="@drawable/bottom_bar_button_selector"
                 android:src="@drawable/ic_action_new"
+                android:id="@+id/show_product_dialog"
                 android:onClick="showSelectProductDialog"/>
 
         <ImageButton
@@ -78,6 +79,7 @@
                 android:layout_weight="1"
                 android:src="@drawable/ic_action_discard"
                 android:background="@drawable/bottom_bar_button_selector"
+                android:id="@+id/delete_product"
                 android:onClick="deleteProductItem"/>
     </LinearLayout>
 </LinearLayout>

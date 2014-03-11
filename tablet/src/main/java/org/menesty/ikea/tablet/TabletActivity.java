@@ -267,10 +267,8 @@ public class TabletActivity extends Activity implements TaskCallbacks, LoadDataL
 
     @Override
     public void onPostExecute(BaseAsyncTask task, Object result) {
-
         PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
-        PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
-                getClass().getName());
+        PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, getClass().getName());
 
         if (wl.isHeld())
             wl.release();
@@ -284,6 +282,19 @@ public class TabletActivity extends Activity implements TaskCallbacks, LoadDataL
             } else
                 loadData();
         }
+
+        if(task instanceof UploadDataTask)
+            disableControl();
+
+    }
+
+    private void disableControl() {
+        findViewById(R.id.add_paragon).setEnabled(false);
+        findViewById(R.id.delete_paragon).setEnabled(false);
+        findViewById(R.id.send_product).setEnabled(false);
+
+        findViewById(R.id.show_product_dialog).setEnabled(false);
+        findViewById(R.id.delete_product).setEnabled(false);
 
     }
 }
