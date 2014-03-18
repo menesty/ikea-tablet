@@ -15,11 +15,13 @@ public class ProductItem implements Parcelable {
         price = in.readDouble();
         weight = in.readDouble();
         orderId = in.readInt();
+        shortName = in.readString();
     }
 
-    public ProductItem(String productId, String productName, double count, double price, double weight, int orderId) {
+    public ProductItem(String productId, String productName, String shortName, double count, double price, double weight, int orderId) {
         this.artNumber = productId;
         this.productName = productName;
+        this.shortName = shortName;
         this.count = count;
         this.price = price;
         this.weight = weight;
@@ -38,6 +40,8 @@ public class ProductItem implements Parcelable {
 
     public int orderId;
 
+    public String shortName;
+
     @Override
     public int describeContents() {
         return 0;
@@ -51,5 +55,6 @@ public class ProductItem implements Parcelable {
         parcel.writeDouble(price);
         parcel.writeDouble(weight);
         parcel.writeInt(orderId);
+        parcel.writeString(shortName);
     }
 }

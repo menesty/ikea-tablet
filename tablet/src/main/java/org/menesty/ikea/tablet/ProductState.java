@@ -28,10 +28,10 @@ public class ProductState {
                 count = count == null ? 0 : count;
 
                 if (count == 0 || count < productItem.count)
-                    productItems.add(new ProductItem(productItem.productId, productItem.productName, productItem.count - count, productItem.price, productItem.weight, productItem.orderId));
+                    productItems.add(new ProductItem(productItem.productId, productItem.productName, productItem.shortName, productItem.count - count, productItem.price, productItem.weight, productItem.orderId));
             }
         }
-        return productItems.toArray(new ProductItem[0]);
+        return productItems.toArray(new ProductItem[productItems.size()]);
     }
 
     public ProductItem find(String productId) {
@@ -42,7 +42,7 @@ public class ProductState {
                 count = count == null ? 0 : count;
 
                 if (count == 0 || count < productItem.count)
-                    return new ProductItem(productItem.productId, productItem.productName, productItem.count - count, productItem.price, productItem.weight, productItem.orderId);
+                    return new ProductItem(productItem.productId, productItem.productName,  productItem.shortName, productItem.count - count, productItem.price, productItem.weight, productItem.orderId);
 
                 return null;
             }
@@ -65,7 +65,7 @@ public class ProductState {
 
 
     public AvailableProductItem[] getBaseState() {
-        return baseState.toArray(new AvailableProductItem[0]);
+        return baseState.toArray(new AvailableProductItem[baseState.size()]);
     }
 
     public String[] getState() {
@@ -74,7 +74,7 @@ public class ProductState {
         for (Map.Entry<String, Double> entry : state.entrySet())
             result.add(entry.getKey() + "|" + entry.getValue());
 
-        return result.toArray(new String[0]);
+        return result.toArray(new String[result.size()]);
     }
 
     public void setState(String... states) {
