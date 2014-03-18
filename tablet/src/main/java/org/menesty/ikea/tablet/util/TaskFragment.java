@@ -58,9 +58,6 @@ public class TaskFragment<Result> extends Fragment implements TaskListener<Resul
     public void onTaskStarted() {
         isTaskRunning = true;
 
-        if (showDialog)
-            showDialog();
-
         if (lockScreen)
             lockScreenOrientation();
     }
