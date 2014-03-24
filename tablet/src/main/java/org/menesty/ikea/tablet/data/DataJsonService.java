@@ -94,21 +94,30 @@ public class DataJsonService {
             for (int i = 0; i < data.size(); i++) {
                 writer.beginObject();
                 writer.name("paragonId").value(i);
-                writer.name("orderId").value(0);
                 writer.name("userId").value(i);
                 writer.name("items");
+
                 writer.beginArray();
 
-                for (ProductItem item : data.get(i)) {
-                    writer.beginObject();
-                    writer.name("productNumber").value(item.productName);
-                    writer.name("price").value(item.price);
-                    writer.name("count").value(item.count);
-                    writer.name("shortName").value(item.shortName);
-                    writer.endObject();
+                ProductItem[] items = data.get(i);
+                int orderId = 0;
+                if (items.length > 0) {
+                    orderId = items[0].orderId;
+
+                    for (ProductItem item : items) {
+                        writer.beginObject();
+                        writer.name("productNumber").value(item.productName);
+                        writer.name("price").value(item.price);
+                        writer.name("count").value(item.count);
+                        writer.name("shortName").value(item.shortName);
+                        writer.endObject();
+                    }
                 }
 
                 writer.endArray();
+
+                writer.name("orderId").value(orderId);
+
                 writer.endObject();
 
             }
