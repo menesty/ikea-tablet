@@ -84,11 +84,12 @@ public class TabletActivity extends Activity implements TaskCallbacks, LoadDataL
             TaskFragment<List<AvailableProductItem>> mTaskFragment = cast(getFragmentManager().findFragmentByTag("task"));
 
             if (mTaskFragment == null) {
-                dataLoadState = DATA_LOADING;
                 mTaskFragment = new TaskFragment<List<AvailableProductItem>>();
                 getFragmentManager().beginTransaction().add(mTaskFragment, "task").commit();
-                mTaskFragment.start(new LoadServerDataTask(), Config.getServerUrl(), Config.getUser(), Config.getPassword());
             }
+
+            dataLoadState = DATA_LOADING;
+            mTaskFragment.start(new LoadServerDataTask(), Config.getServerUrl(), Config.getUser(), Config.getPassword());
 
         } else {
             InternetConnectionDialog internetConnectionDialog = cast(getFragmentManager().findFragmentByTag("internetConnectionDialog"));
@@ -97,6 +98,7 @@ public class TabletActivity extends Activity implements TaskCallbacks, LoadDataL
                 internetConnectionDialog = new InternetConnectionDialog();
 
             getFragmentManager().beginTransaction().add(internetConnectionDialog, "internetConnectionDialog").commit();
+            dataLoadState = 0;
         }
 
 
@@ -281,6 +283,7 @@ public class TabletActivity extends Activity implements TaskCallbacks, LoadDataL
                 dataLoadState = DATA_LOADED;
             } else
                 loadData();
+
         }
 
         if(task instanceof UploadDataTask)

@@ -21,6 +21,8 @@ public class TaskFragment<Result> extends Fragment implements TaskListener<Resul
 
     private boolean lockScreen;
 
+    private boolean dialogShowed;
+
 
     public TaskFragment(boolean showDialog, boolean lockScreen) {
         this.showDialog = showDialog;
@@ -35,7 +37,7 @@ public class TaskFragment<Result> extends Fragment implements TaskListener<Resul
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        if (showDialog && isTaskRunning)
+        if (showDialog && isTaskRunning && !dialogShowed)
             showDialog();
     }
 
@@ -60,16 +62,22 @@ public class TaskFragment<Result> extends Fragment implements TaskListener<Resul
 
         if (lockScreen)
             lockScreenOrientation();
+
+        if (isAdded() && showDialog && isTaskRunning && !dialogShowed)
+            showDialog();
     }
 
     private void showDialog() {
         progressDialog = ProgressDialog.show(getActivity(), "Loading", "Please wait a moment!");
+        dialogShowed = true;
     }
 
     @Override
     public void onTaskFinished(Result result) {
-        if (progressDialog != null)
+        if (progressDialog != null) {
             progressDialog.dismiss();
+            dialogShowed = false;
+        }
 
         if (lockScreen)
             unlockScreenOrientation();
@@ -83,8 +91,10 @@ public class TaskFragment<Result> extends Fragment implements TaskListener<Resul
     public void onDetach() {
         // All dialogs should be closed before leaving the activity in order to avoid
         // the: Activity has leaked window com.android.internal.policy... exception
-        if (progressDialog != null && progressDialog.isShowing())
+        if (progressDialog != null && progressDialog.isShowing()) {
             progressDialog.dismiss();
+            dialogShowed = false;
+        }
 
         super.onDetach();
     }
