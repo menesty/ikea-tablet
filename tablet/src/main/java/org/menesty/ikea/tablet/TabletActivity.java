@@ -118,6 +118,11 @@ public class TabletActivity extends Activity implements TaskCallbacks, LoadDataL
             @Override
             public void onProductId(String productId) {
                 Log.e(getClass().getSimpleName(), productId);
+
+                if (productId.length() > 8)
+                    productId = productId.substring(0, 8);
+
+                Toast.makeText(getBaseContext(), "Scan :" + productId, Toast.LENGTH_LONG).show();
                 addProduct(productId);
             }
         };
@@ -134,7 +139,7 @@ public class TabletActivity extends Activity implements TaskCallbacks, LoadDataL
         ProductItem product = productState.find(productId);
 
         if (product == null) {
-            Toast.makeText(getApplicationContext(), "Product not available in order", Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), "Product not available in order", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -286,7 +291,7 @@ public class TabletActivity extends Activity implements TaskCallbacks, LoadDataL
 
         }
 
-        if(task instanceof UploadDataTask)
+        if (task instanceof UploadDataTask)
             disableControl();
 
     }
