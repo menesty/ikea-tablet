@@ -158,4 +158,14 @@ public class ParagonControlComponent {
 
         return result;
     }
+
+    public void reset() {
+        ViewFlipper flipper = (ViewFlipper) (context.findViewById(R.id.listViewContainer));
+        flipper.removeAllViews();
+
+        RadioGroup paragonGroup = (RadioGroup) (context.findViewById(R.id.paragon_group));
+        paragonGroup.removeAllViews();
+
+        createParagon();
+    }
 }

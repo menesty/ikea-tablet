@@ -116,11 +116,14 @@ public class ProductChoiceDialog extends DialogFragment implements NumberPicker.
         d.setTitle("NumberPicker");
         d.setContentView(R.layout.number_dialog);
         Button b1 = (Button) d.findViewById(R.id.button1);
+
         final NumberPicker np = (NumberPicker) d.findViewById(R.id.numberPicker1);
         np.setMaxValue((int) item.count);
         np.setMinValue(1);
         np.setWrapSelectorWheel(false);
         np.setOnValueChangedListener(this);
+        np.setDescendantFocusability(NumberPicker.FOCUS_BLOCK_DESCENDANTS);
+
         b1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

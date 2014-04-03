@@ -17,4 +17,10 @@
             android:icon="@drawable/ic_action_send_now"
             android:showAsAction="always"
             android:onClick="sendToServer" />
+    <item
+            android:id="@+id/refresh"
+            android:icon="@drawable/ic_action_refresh"
+            android:showAsAction="always"
+            android:onClick="refresh"
+            android:visible="false"/>
 </menu>

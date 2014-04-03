@@ -45,6 +45,8 @@ public class TabletActivity extends Activity implements TaskCallbacks, LoadDataL
 
     private int dataLoadState;
 
+    private MenuItem refreshMenuItem;
+
     public TabletActivity() {
         instance = this;
     }
@@ -132,6 +134,7 @@ public class TabletActivity extends Activity implements TaskCallbacks, LoadDataL
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);
+        refreshMenuItem = menu.findItem(R.id.refresh);
         return true;
     }
 
@@ -198,6 +201,7 @@ public class TabletActivity extends Activity implements TaskCallbacks, LoadDataL
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
         int viewCount = savedInstanceState.getInt("viewCount");
+
         for (int i = 0; i < viewCount; i++)
             restoreState(this.<ProductItem[]>cast(savedInstanceState.getParcelableArray("view_" + i)));
 
@@ -292,18 +296,26 @@ public class TabletActivity extends Activity implements TaskCallbacks, LoadDataL
         }
 
         if (task instanceof UploadDataTask)
-            disableControl();
+            enableControl(false);
 
     }
 
-    private void disableControl() {
-        findViewById(R.id.add_paragon).setEnabled(false);
-        findViewById(R.id.delete_paragon).setEnabled(false);
-        findViewById(R.id.send_product).setEnabled(false);
+    private void enableControl(boolean enable) {
+        findViewById(R.id.add_paragon).setEnabled(enable);
+        findViewById(R.id.delete_paragon).setEnabled(enable);
+        findViewById(R.id.send_product).setEnabled(enable);
 
-        findViewById(R.id.show_product_dialog).setEnabled(false);
-        findViewById(R.id.delete_product).setEnabled(false);
+        findViewById(R.id.show_product_dialog).setEnabled(enable);
+        findViewById(R.id.delete_product).setEnabled(enable);
 
+        refreshMenuItem.setVisible(!enable);
+    }
+
+    public void refresh(MenuItem menuItem) {
+        dataLoadState = 0;
+        paragonControlComponent.reset();
+        enableControl(true);
+        loadData();
     }
 }
 
