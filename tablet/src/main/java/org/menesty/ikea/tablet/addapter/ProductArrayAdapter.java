@@ -57,7 +57,7 @@ public class ProductArrayAdapter extends ArrayAdapter<ProductItem> {
 
         ViewHolder holder = (ViewHolder) view.getTag();
 
-        holder.text.setText(list.get(position).artNumber);
+        holder.text.setText(list.get(position).productName);
         holder.count.setText(NumberUtil.toString(list.get(position).count));
         holder.price.setText(NumberUtil.toString(list.get(position).price));
         holder.weight.setText(NumberFormat.getInstance().format(BigDecimal.valueOf(list.get(position).weight / 1000).doubleValue()) + " kg");
@@ -91,7 +91,6 @@ public class ProductArrayAdapter extends ArrayAdapter<ProductItem> {
             }
 
         super.insert(object, 0);
-
     }
 
     @Override

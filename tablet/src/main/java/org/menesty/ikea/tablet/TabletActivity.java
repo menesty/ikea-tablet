@@ -1,6 +1,7 @@
 package org.menesty.ikea.tablet;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.app.FragmentManager;
 import android.content.Context;
 import android.net.ConnectivityManager;
@@ -12,6 +13,8 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
+import android.widget.NumberPicker;
 import android.widget.Toast;
 import org.menesty.ikea.tablet.component.ParagonControlComponent;
 import org.menesty.ikea.tablet.component.ProductViewLayout;
@@ -41,6 +44,8 @@ public class TabletActivity extends Activity implements TaskCallbacks, LoadDataL
 
     private static final int DATA_LOADING = 1;
 
+    private static final int DATA_NOT_LOADED = 0;
+
     private static final int DATA_LOADED = 2;
 
     private int dataLoadState;
@@ -65,14 +70,9 @@ public class TabletActivity extends Activity implements TaskCallbacks, LoadDataL
 
         if (savedInstanceState == null) {
             createParagon(null);
-        }
-
-        if (dataLoadState == 0) {
-            //check if connection present
             loadData();
         }
         //new AutoUpdateApk(getApplicationContext());
-
     }
 
     @Override
@@ -82,7 +82,7 @@ public class TabletActivity extends Activity implements TaskCallbacks, LoadDataL
         NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
         boolean isConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting();
 
-        if (isConnected && dataLoadState == 0) {
+        if (isConnected && dataLoadState == DATA_NOT_LOADED) {
             TaskFragment<List<AvailableProductItem>> mTaskFragment = cast(getFragmentManager().findFragmentByTag("task"));
 
             if (mTaskFragment == null) {
@@ -100,7 +100,7 @@ public class TabletActivity extends Activity implements TaskCallbacks, LoadDataL
                 internetConnectionDialog = new InternetConnectionDialog();
 
             getFragmentManager().beginTransaction().add(internetConnectionDialog, "internetConnectionDialog").commit();
-            dataLoadState = 0;
+            dataLoadState = DATA_NOT_LOADED;
         }
 
 
@@ -115,7 +115,6 @@ public class TabletActivity extends Activity implements TaskCallbacks, LoadDataL
     }
 
     private void init() {
-
         productIdKeyboardHandler = new ProductIdKeyboardHandler() {
             @Override
             public void onProductId(String productId) {
@@ -146,7 +145,7 @@ public class TabletActivity extends Activity implements TaskCallbacks, LoadDataL
             return;
         }
 
-        addProduct(product);
+        showProductChoiceCount(product);
     }
 
     private void addProduct(ProductItem productItem) {
@@ -198,6 +197,7 @@ public class TabletActivity extends Activity implements TaskCallbacks, LoadDataL
         productIdKeyboardHandler.cancel();
     }
 
+    @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
         int viewCount = savedInstanceState.getInt("viewCount");
@@ -215,12 +215,15 @@ public class TabletActivity extends Activity implements TaskCallbacks, LoadDataL
             dialog.setListener(new ProductChoiceDialog.ItemSelectListener() {
                 @Override
                 public void onItemSelect(ProductItem item) {
-                    addProduct(item.productName);
+                    showProductChoiceCount(item);
                 }
             });
         }
 
         dataLoadState = savedInstanceState.getInt("loadDataState");
+
+        if (dataLoadState == DATA_NOT_LOADED)
+            loadData();
     }
 
     public void showSelectProductDialog(View view) {
@@ -232,7 +235,7 @@ public class TabletActivity extends Activity implements TaskCallbacks, LoadDataL
             dialog.setListener(new ProductChoiceDialog.ItemSelectListener() {
                 @Override
                 public void onItemSelect(ProductItem item) {
-                    addProduct(item);
+                    showProductChoiceCount(item);
                 }
             });
             dialog.show(fm, "ProductChoiceDialog");
@@ -316,6 +319,34 @@ public class TabletActivity extends Activity implements TaskCallbacks, LoadDataL
         paragonControlComponent.reset();
         enableControl(true);
         loadData();
+    }
+
+    public void showProductChoiceCount(final ProductItem item) {
+        if (item.count == 1) {
+            addProduct(item);
+            return;
+        }
+
+        final Dialog d = new Dialog(TabletActivity.get());
+        d.setTitle("NumberPicker");
+        d.setContentView(R.layout.number_dialog);
+        Button b1 = (Button) d.findViewById(R.id.button1);
+
+        final NumberPicker np = (NumberPicker) d.findViewById(R.id.numberPicker1);
+        np.setMaxValue((int) item.count);
+        np.setMinValue(1);
+        np.setWrapSelectorWheel(false);
+        np.setDescendantFocusability(NumberPicker.FOCUS_BLOCK_DESCENDANTS);
+
+        b1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                item.count = np.getValue();
+                addProduct(item);
+                d.dismiss();
+            }
+        });
+        d.show();
     }
 }
 
