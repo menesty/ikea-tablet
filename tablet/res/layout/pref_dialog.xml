@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+                  android:layout_width="fill_parent"
+                  android:layout_height="wrap_content">
+
+    <PreferenceCategory
+            android:title="server configuration"
+            android:key="pref_key_storage_settings">
+
+        <EditTextPreference
+                android:key="pref_server_url"
+                android:title="@string/pref_server_url"
+                android:summary="@string/pref_server_url_summ"
+                android:defaultValue="" />
+
+        <EditTextPreference
+                android:key="pref_user_login"
+                android:summary="@string/pref_user_login_summ"
+                android:title="@string/pref_user_login"
+                android:defaultValue="" />
+
+        <EditTextPreference
+                android:key="pref_user_password"
+                android:summary="@string/pref_user_password_summ"
+                android:title="@string/pref_user_password"
+                android:defaultValue="" />
+    </PreferenceCategory>
+</PreferenceScreen>

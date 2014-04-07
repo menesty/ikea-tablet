@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.app.FragmentManager;
 import android.content.Context;
+import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
@@ -102,13 +103,15 @@ public class TabletActivity extends Activity implements TaskCallbacks, LoadDataL
             getFragmentManager().beginTransaction().add(internetConnectionDialog, "internetConnectionDialog").commit();
             dataLoadState = DATA_NOT_LOADED;
         }
-
-
     }
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         findViewById(R.id.focus_button).requestFocus();
+
+        if (KeyEvent.KEYCODE_BACK == keyCode)
+            return false;
+
         productIdKeyboardHandler.handleChar((char) event.getUnicodeChar());
         Log.e(getClass().getSimpleName(), (char) event.getUnicodeChar() + " " + (event.getAction() == KeyEvent.ACTION_DOWN));
         return true;
@@ -319,6 +322,11 @@ public class TabletActivity extends Activity implements TaskCallbacks, LoadDataL
         paragonControlComponent.reset();
         enableControl(true);
         loadData();
+    }
+
+    public void settings(MenuItem menuItem) {
+        Intent intentSetPref = new Intent(getApplicationContext(), PrefActivity.class);
+        startActivityForResult(intentSetPref, 0);
     }
 
     public void showProductChoiceCount(final ProductItem item) {

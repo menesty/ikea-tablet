@@ -4,4 +4,15 @@
     <string name="load_data_from_server">Load data from server ...</string>
     <string name="reloadData">Try load data</string>
     <string name="reloadDataInfo">You have not connection to internet, connect wifi or mobile internet and try again.</string>
+
+    <string name="pref_server_url">Server URL</string>
+    <string name="pref_server_url_summ">Input server for sync</string>
+
+    <string name="pref_user_login">User login</string>
+    <string name="pref_user_login_summ">login user to auth to server for sync</string>
+
+
+    <string name="pref_user_password">User password URL</string>
+    <string name="pref_user_password_summ">password user to auth to server for syn</string>
+
 </resources>

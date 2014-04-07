@@ -23,4 +23,11 @@
             android:showAsAction="always"
             android:onClick="refresh"
             android:visible="false"/>
+
+    <item
+            android:showAsAction="never|withText"
+            android:onClick="settings"
+            android:title="Settings"
+            />
+
 </menu>

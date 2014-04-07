@@ -32,12 +32,6 @@ public class ProductChoiceDialog extends DialogFragment {
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
-        editText.requestFocus();
-    }
-
-    @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         // Use the Builder class for convenient dialog construction
         if (savedInstanceState != null)
