@@ -92,6 +92,11 @@ public class DataJsonService {
             writer.beginArray();
 
             for (int i = 0; i < data.size(); i++) {
+                ProductItem[] items = data.get(i);
+
+                if(items.length == 0)
+                    continue;
+
                 writer.beginObject();
                 writer.name("paragonId").value(i);
                 writer.name("userId").value(i);
@@ -99,7 +104,6 @@ public class DataJsonService {
 
                 writer.beginArray();
 
-                ProductItem[] items = data.get(i);
                 int orderId = 0;
                 if (items.length > 0) {
                     orderId = items[0].orderId;
