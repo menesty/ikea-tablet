@@ -101,8 +101,7 @@ public class ProductViewLayout extends LinearLayout {
         }
 
         priceView.setText(price.doubleValue() + " PL");
-        weightView.setText(NumberFormat.getInstance().format(BigDecimal.valueOf(weight.doubleValue() / 1000).doubleValue()) + " Kg");
-
+        weightView.setText(NumberFormat.getInstance().format(weight.doubleValue()) + " Kg");
 
         LinearLayout c = (LinearLayout) findViewById(R.id.status_panel);
         c.removeAllViews();
@@ -116,6 +115,7 @@ public class ProductViewLayout extends LinearLayout {
         textView.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT, 1));
         textView.setGravity(Gravity.CENTER);
         textView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 30);
+
         return textView;
     }
 

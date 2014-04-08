@@ -11,7 +11,7 @@ public class SettingFragment extends PreferenceFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        addPreferencesFromResource(R.layout.pref_dialog);
+        addPreferencesFromResource(R.layout.application_settings);
     }
 
 }

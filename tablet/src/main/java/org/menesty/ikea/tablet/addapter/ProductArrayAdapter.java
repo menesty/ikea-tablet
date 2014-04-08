@@ -10,7 +10,6 @@ import org.menesty.ikea.tablet.R;
 import org.menesty.ikea.tablet.domain.ProductItem;
 import org.menesty.ikea.tablet.util.NumberUtil;
 
-import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -60,8 +59,7 @@ public class ProductArrayAdapter extends ArrayAdapter<ProductItem> {
         holder.text.setText(list.get(position).productName);
         holder.count.setText(NumberUtil.toString(list.get(position).count));
         holder.price.setText(NumberUtil.toString(list.get(position).price));
-        holder.weight.setText(NumberFormat.getInstance().format(BigDecimal.valueOf(list.get(position).weight / 1000).doubleValue()) + " kg");
-
+        holder.weight.setText(NumberFormat.getInstance().format(list.get(position).weight) + " kg");
 
         int columnWidth = (int) (parent.getMeasuredWidth() * 0.1);
         holder.text.setMinWidth(parent.getMeasuredWidth() - columnWidth * 3);

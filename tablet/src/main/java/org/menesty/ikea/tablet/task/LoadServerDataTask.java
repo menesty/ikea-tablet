@@ -2,6 +2,7 @@ package org.menesty.ikea.tablet.task;
 
 import org.menesty.ikea.tablet.auth.AuthService;
 import org.menesty.ikea.tablet.data.DataJsonService;
+import org.menesty.ikea.tablet.domain.ApplicationPreferences;
 import org.menesty.ikea.tablet.domain.AvailableProductItem;
 
 import java.io.IOException;
@@ -14,16 +15,19 @@ public class LoadServerDataTask extends BaseAsyncTask<Object, Integer, List<Avai
 
     @Override
     protected List<AvailableProductItem> doInBackground(Object... data) {
+        ApplicationPreferences setting = (ApplicationPreferences) data[0];
+
         InputStream input = null;
         HttpURLConnection connection = null;
-        String desUrl = data[0] + "/storage/load";
+
+        String desUrl = setting.getServerName() + "/storage/load";
 
         AuthService authService = new AuthService();
         try {
             URL url = new URL(desUrl);
             connection = (HttpURLConnection) url.openConnection();
 
-            String authHeader = authService.authHeader(desUrl, (String) data[1], (String) data[2], "GET");
+            String authHeader = authService.authHeader(desUrl, setting.getUserName(), setting.getPassword(), "GET");
             connection.setRequestProperty("Authorization", authHeader);
 
             connection.connect();

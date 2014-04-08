@@ -13,6 +13,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
 import org.menesty.ikea.tablet.auth.AuthService;
+import org.menesty.ikea.tablet.domain.ApplicationPreferences;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -26,10 +27,11 @@ import java.net.URL;
 public class UploadDataTask extends BaseAsyncTask<Object, Integer, Void> {
     @Override
     protected Void doInBackground(Object... data) {
-        String desUrl = data[0] + "/storage/executeExport";
+        ApplicationPreferences setting = (ApplicationPreferences) data[0];
+        String desUrl = setting.getServerName() + "/storage/executeExport";
         try {
             AuthService authService = new AuthService();
-            String authHeader = authService.authHeader(desUrl, (String) data[1], (String) data[2], "POST");
+            String authHeader = authService.authHeader(desUrl, setting.getUserName(), setting.getPassword(), "POST");
 
 
             HttpClient httpclient = new DefaultHttpClient();

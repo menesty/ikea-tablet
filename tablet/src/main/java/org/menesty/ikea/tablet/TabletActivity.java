@@ -55,6 +55,7 @@ public class TabletActivity extends Activity implements TaskCallbacks, LoadDataL
 
     public TabletActivity() {
         instance = this;
+
     }
 
     public static TabletActivity get() {
@@ -64,7 +65,6 @@ public class TabletActivity extends Activity implements TaskCallbacks, LoadDataL
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Config.init(this);
         setContentView(R.layout.main);
         init();
         paragonControlComponent = new ParagonControlComponent(this);
@@ -73,7 +73,6 @@ public class TabletActivity extends Activity implements TaskCallbacks, LoadDataL
             createParagon(null);
             loadData();
         }
-        //new AutoUpdateApk(getApplicationContext());
     }
 
     @Override
@@ -92,7 +91,7 @@ public class TabletActivity extends Activity implements TaskCallbacks, LoadDataL
             }
 
             dataLoadState = DATA_LOADING;
-            mTaskFragment.start(new LoadServerDataTask(), Config.getServerUrl(), Config.getUser(), Config.getPassword());
+            mTaskFragment.start(new LoadServerDataTask(), SettingService.getSetting(this));
 
         } else {
             InternetConnectionDialog internetConnectionDialog = cast(getFragmentManager().findFragmentByTag("internetConnectionDialog"));
@@ -171,7 +170,7 @@ public class TabletActivity extends Activity implements TaskCallbacks, LoadDataL
             mTaskFragment = new TaskFragment<Void>();
 
         if (!mTaskFragment.isRunning()) {
-            mTaskFragment.start(new UploadDataTask(), Config.getServerUrl(), Config.getUser(), Config.getPassword(), result);
+            mTaskFragment.start(new UploadDataTask(), SettingService.getSetting(this), result);
             getFragmentManager().beginTransaction().add(mTaskFragment, "task-upload").commit();
         }
 
