@@ -16,13 +16,18 @@ public class InternetConnectionDialog extends DialogFragment implements DialogIn
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         AlertDialog.Builder adb = new AlertDialog.Builder(getActivity())
                 .setTitle("Problem connecting to internet").setPositiveButton(R.string.reloadData, this)
-                .setMessage(R.string.reloadDataInfo);
+                .setMessage(R.string.reloadDataInfo)
+                .setNegativeButton(R.string.settings, this);
         return adb.create();
     }
 
     @Override
     public void onClick(DialogInterface dialog, int which) {
         dismiss();
-        ((TabletActivity) getActivity()).loadData();
+
+        if (which == -1)
+            ((TabletActivity) getActivity()).loadData();
+        else
+            TabletActivity.showApplicationSettings(getActivity(), true);
     }
 }

@@ -17,5 +17,7 @@ public class PrefActivity extends Activity {
         FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
         fragmentTransaction.replace(android.R.id.content, new SettingFragment());
         fragmentTransaction.commit();
+
+        setResult(RESULT_OK, getIntent());
     }
 }

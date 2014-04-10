@@ -228,6 +228,14 @@ public class TabletActivity extends Activity implements TaskCallbacks, LoadDataL
             loadData();
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        boolean result = data.getBooleanExtra("connectionDialog", false);
+        if (requestCode == 10 && data.getBooleanExtra("connectionDialog", false))
+            loadData();
+    }
+
+
     public void showSelectProductDialog(View view) {
         FragmentManager fm = getFragmentManager();
         ProductChoiceDialog dialog = (ProductChoiceDialog) fm.findFragmentByTag("ProductChoiceDialog");
@@ -324,8 +332,13 @@ public class TabletActivity extends Activity implements TaskCallbacks, LoadDataL
     }
 
     public void settings(MenuItem menuItem) {
-        Intent intentSetPref = new Intent(getApplicationContext(), PrefActivity.class);
-        startActivityForResult(intentSetPref, 0);
+        showApplicationSettings(this, false);
+    }
+
+    public static void showApplicationSettings(Activity context, boolean connectionDialog) {
+        Intent intentSetPref = new Intent(context, PrefActivity.class);
+        intentSetPref.putExtra("connectionDialog", connectionDialog);
+        context.startActivityForResult(intentSetPref, 10);
     }
 
     public void showProductChoiceCount(final ProductItem item) {
