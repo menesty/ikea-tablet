@@ -18,7 +18,10 @@ public class InternetConnectionDialog extends DialogFragment implements DialogIn
                 .setTitle("Problem connecting to internet").setPositiveButton(R.string.reloadData, this)
                 .setMessage(R.string.reloadDataInfo)
                 .setNegativeButton(R.string.settings, this);
-        return adb.create();
+        Dialog dialog = adb.create();
+        dialog.setCanceledOnTouchOutside(false);
+
+        return dialog;
     }
 
     @Override

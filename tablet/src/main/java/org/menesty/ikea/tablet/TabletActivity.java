@@ -230,7 +230,6 @@ public class TabletActivity extends Activity implements TaskCallbacks, LoadDataL
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        boolean result = data.getBooleanExtra("connectionDialog", false);
         if (requestCode == 10 && data.getBooleanExtra("connectionDialog", false))
             loadData();
     }
