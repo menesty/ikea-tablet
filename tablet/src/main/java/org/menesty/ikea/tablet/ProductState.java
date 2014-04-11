@@ -24,7 +24,7 @@ public class ProductState {
 
         for (AvailableProductItem productItem : baseState) {
             if (productItem.allowed && productItem.visible) {
-                Double count = state.get(productItem.productId + "_" + productItem.price);
+                Double count = state.get(getKey(productItem));
                 count = count == null ? 0 : count;
 
                 if (count == 0 || count < productItem.count)
@@ -37,14 +37,12 @@ public class ProductState {
     public ProductItem find(String productId) {
         for (AvailableProductItem productItem : baseState)
             if (productItem.productId.equals(productId) && productItem.allowed && productItem.visible) {
-
-                Double count = state.get(productItem.productId + "_" + productItem.price);
+                Double count = state.get(getKey(productItem));
                 count = count == null ? 0 : count;
 
                 if (count == 0 || count < productItem.count)
                     return new ProductItem(productItem.productId, productItem.productName,  productItem.shortName, productItem.count - count, productItem.price, productItem.weight, productItem.orderId);
 
-                return null;
             }
 
         return null;
@@ -55,12 +53,22 @@ public class ProductState {
     }
 
     public void takeProduct(ProductItem product) {
-        String key = product.artNumber + "_" + product.price;
+        String key = getKey(product);
         Double count = state.get(key);
+
         if (count == null)
             count = 0d;
+
         state.put(key, count + product.count);
 
+    }
+
+    private String getKey(ProductItem product){
+        return product.productName + "_" + product.price;
+    }
+
+    private String getKey(AvailableProductItem productItem){
+        return productItem.productName + "_" + productItem.price;
     }
 
 
@@ -92,7 +100,7 @@ public class ProductState {
     }
 
     public void returnBack(ProductItem product, double count) {
-        String key = product.artNumber + "_" + product.price;
+        String key = product.productName + "_" + product.price;
         Double c = state.get(key);
 
         if (c == null)
