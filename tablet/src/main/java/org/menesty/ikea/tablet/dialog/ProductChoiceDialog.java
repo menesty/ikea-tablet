@@ -3,11 +3,14 @@ package org.menesty.ikea.tablet.dialog;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -33,7 +36,6 @@ public class ProductChoiceDialog extends DialogFragment {
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        // Use the Builder class for convenient dialog construction
         if (savedInstanceState != null)
             products = (ProductItem[]) (savedInstanceState.getParcelableArray("product_item_dialog"));
 
@@ -42,6 +44,21 @@ public class ProductChoiceDialog extends DialogFragment {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         editText = new EditText(getActivity());
+
+        editText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean focus) {
+                Configuration config = getResources().getConfiguration();
+                boolean keyBordPresent = config.keyboard != Configuration.KEYBOARD_NOKEYS;
+
+                if (keyBordPresent)
+                    ((InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE))
+                            .showSoftInput(editText, focus ? InputMethodManager.SHOW_FORCED : InputMethodManager.HIDE_NOT_ALWAYS);
+
+            }
+        });
+
+
         final ListView listview = new ListView(getActivity());
 
         editText.setCompoundDrawablesWithIntrinsicBounds(R.drawable.discoverseed_larg, 0, 0, 0);
