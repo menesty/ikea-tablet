@@ -51,9 +51,9 @@ public class ProductChoiceDialog extends DialogFragment {
                 Configuration config = getResources().getConfiguration();
                 boolean keyBordPresent = config.keyboard != Configuration.KEYBOARD_NOKEYS;
 
-                if (keyBordPresent)
+                if (keyBordPresent && focus)
                     ((InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE))
-                            .showSoftInput(editText, focus ? InputMethodManager.SHOW_FORCED : InputMethodManager.HIDE_NOT_ALWAYS);
+                            .showSoftInput(editText, InputMethodManager.SHOW_FORCED);
 
             }
         });
