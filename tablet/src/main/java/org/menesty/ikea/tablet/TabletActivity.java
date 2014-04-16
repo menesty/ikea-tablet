@@ -1,8 +1,6 @@
 package org.menesty.ikea.tablet;
 
-import android.app.Activity;
-import android.app.Dialog;
-import android.app.FragmentManager;
+import android.app.*;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
@@ -33,7 +31,7 @@ import org.menesty.ikea.tablet.util.TaskFragment;
 import java.io.IOException;
 import java.util.List;
 
-public class TabletActivity extends Activity implements TaskCallbacks, LoadDataListener {
+public class TabletActivity extends Activity implements TaskCallbacks, LoadDataListener, ActionBar.TabListener {
 
     private ProductIdKeyboardHandler productIdKeyboardHandler;
 
@@ -67,7 +65,11 @@ public class TabletActivity extends Activity implements TaskCallbacks, LoadDataL
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
         init();
+
         paragonControlComponent = new ParagonControlComponent(this);
+
+        ActionBar bar = getActionBar();
+        bar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
         if (savedInstanceState == null) {
             createParagon(null);
@@ -367,5 +369,29 @@ public class TabletActivity extends Activity implements TaskCallbacks, LoadDataL
         });
         d.show();
     }
+
+    @Override
+    public void onTabSelected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
+      /*  // When the given tab is selected, show the tab contents in the
+        // container view.
+        Fragment fragment = new DummySectionFragment();
+        Bundle args = new Bundle();
+        args.putInt(DummySectionFragment.ARG_SECTION_NUMBER,
+                tab.getPosition() + 1);
+        fragment.setArguments(args);
+        getFragmentManager().beginTransaction()
+                .attach(fragment).commit();*/
+    }
+
+    @Override
+    public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
+
+    }
+
+    @Override
+    public void onTabReselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
+
+    }
+
 }
 

@@ -1,12 +1,14 @@
 package org.menesty.ikea.tablet.component;
 
 import android.app.Activity;
+import android.os.Bundle;
 import android.view.View;
 import android.view.animation.AnimationUtils;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.ViewFlipper;
 import org.menesty.ikea.tablet.R;
+import org.menesty.ikea.tablet.dialog.NumberDialog;
 import org.menesty.ikea.tablet.domain.ProductItem;
 import org.menesty.ikea.tablet.listener.SlideListener;
 
@@ -86,7 +88,18 @@ public class ParagonControlComponent {
 
         ViewFlipper flipper = (ViewFlipper) (context.findViewById(R.id.listViewContainer));
 
-        ProductViewLayout productViewLayout = new ProductViewLayout(context, flipper);
+        ProductViewLayout productViewLayout = new ProductViewLayout(context, flipper) {
+            @Override
+            public void onItemLongClick(ProductItem item) {
+                NumberDialog dialog = new NumberDialog();
+                Bundle args = new Bundle();
+                args.putDouble("weight", item.weight);
+                args.putString("productName", item.productName);
+                dialog.setArguments(args);
+
+                dialog.show(context.getFragmentManager(), "number-dialog");
+            }
+        };
         productViewLayout.setViewOnTouchListener(listViewOnTouchListener);
 
         flipper.addView(productViewLayout);
@@ -134,12 +147,12 @@ public class ParagonControlComponent {
 
 
     public void deleteParagon() {
-        RadioGroup paragonGroup = (RadioGroup)(context.findViewById(R.id.paragon_group));
+        RadioGroup paragonGroup = (RadioGroup) (context.findViewById(R.id.paragon_group));
         int index = checkedRadioButtonIndex(paragonGroup);
 
         if (index >= 0) {
             paragonGroup.removeViewAt(index);
-            ViewFlipper flipper = (ViewFlipper)(context.findViewById(R.id.listViewContainer));
+            ViewFlipper flipper = (ViewFlipper) (context.findViewById(R.id.listViewContainer));
             flipper.removeViewAt(index);
 
             if (paragonGroup.getChildCount() != 0)
@@ -147,10 +160,10 @@ public class ParagonControlComponent {
         }
     }
 
-    public List<ProductItem[]> getData(){
+    public List<ProductItem[]> getData() {
         List<ProductItem[]> result = new ArrayList<ProductItem[]>();
 
-        ViewFlipper flipper = (ViewFlipper)(context.findViewById(R.id.listViewContainer));
+        ViewFlipper flipper = (ViewFlipper) (context.findViewById(R.id.listViewContainer));
 
         for (int i = 0; i < flipper.getChildCount(); i++)
             if (flipper.getChildAt(i) instanceof ProductViewLayout)
