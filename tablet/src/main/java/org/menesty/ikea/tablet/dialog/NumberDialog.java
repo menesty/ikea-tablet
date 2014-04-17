@@ -32,7 +32,7 @@ public class NumberDialog extends DialogFragment implements DialogInterface.OnCl
         Dialog dialog = adb.create();
         dialog.setCanceledOnTouchOutside(false);
 
-        return null;
+        return dialog;
     }
 
     @Override
