@@ -15,8 +15,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.NumberPicker;
 import android.widget.Toast;
-import org.menesty.ikea.tablet.component.ParagonControlComponent;
-import org.menesty.ikea.tablet.component.ProductViewLayout;
+import org.menesty.ikea.tablet.component.ActiveParagonViewFragment;
+import org.menesty.ikea.tablet.component.ParagonViewFragment;
 import org.menesty.ikea.tablet.data.DataJsonService;
 import org.menesty.ikea.tablet.dialog.InternetConnectionDialog;
 import org.menesty.ikea.tablet.dialog.ProductChoiceDialog;
@@ -29,15 +29,14 @@ import org.menesty.ikea.tablet.task.UploadDataTask;
 import org.menesty.ikea.tablet.util.TaskFragment;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
-public class TabletActivity extends Activity implements TaskCallbacks, LoadDataListener, ActionBar.TabListener {
+public class TabletActivity extends Activity implements TaskCallbacks, LoadDataListener {
 
     private ProductIdKeyboardHandler productIdKeyboardHandler;
 
     private ProductState productState = new ProductState();
-
-    private ParagonControlComponent paragonControlComponent;
 
     private static TabletActivity instance;
 
@@ -49,7 +48,7 @@ public class TabletActivity extends Activity implements TaskCallbacks, LoadDataL
 
     private int dataLoadState;
 
-    private MenuItem refreshMenuItem;
+    private List<ParagonViewFragment> tabs = new ArrayList<ParagonViewFragment>();
 
     public TabletActivity() {
         instance = this;
@@ -63,25 +62,71 @@ public class TabletActivity extends Activity implements TaskCallbacks, LoadDataL
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.main);
+        setContentView(R.layout.activity_tabs);
         init();
 
-        paragonControlComponent = new ParagonControlComponent(this);
-
-        ActionBar bar = getActionBar();
-        bar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+        ActionBar actionBar = getActionBar();
+        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
         if (savedInstanceState == null) {
-            createParagon(null);
+            ActionBar.Tab tab = actionBar.newTab().setText("Active");
+            tabs.add(new ActiveParagonViewFragment(null));
+
+            tab.setTabListener(new TabListener(tabs.get(0)));
+            actionBar.addTab(tab);
+
             loadData();
         }
     }
 
+    private void saveTabState(Bundle outState) {
+        for (int i = 0; i < tabs.size(); i++) {
+            List<ProductItem[]> data = tabs.get(i).getData();
+
+            for (int j = 0; j < data.size(); j++)
+                outState.putParcelableArray("tab_" + i + "_view_" + j, data.get(j));
+
+            outState.putInt("tab_" + i + "_view_count", +data.size());
+        }
+
+        outState.putInt("tab_count", +tabs.size());
+    }
+
+    private void restoreTabState(Bundle outState) {
+        ActionBar actionBar = getActionBar();
+
+        int tabCount = outState.getInt("tab_count");
+
+        for (int i = 0; i < tabCount; i++) {
+            ParagonViewFragment tab;
+            ActionBar.Tab aTab;
+
+            if (i == 0)
+                aTab = actionBar.newTab().setText("Active").setTabListener(new TabListener(tab = new ActiveParagonViewFragment(getTabData(i, outState))));
+            else
+                aTab = actionBar.newTab().setText(i + "").setTabListener(new TabListener(tab = new ParagonViewFragment(getTabData(i, outState))));
+
+            actionBar.addTab(aTab);
+            tabs.add(tab);
+        }
+    }
+
+    private List<ProductItem[]> getTabData(int tabIndex, Bundle outState) {
+        List<ProductItem[]> data = new ArrayList<ProductItem[]>();
+
+        int viewCount = outState.getInt("tab_" + tabIndex + "_view_count");
+
+        for (int i = 0; i < viewCount; i++)
+            data.add((ProductItem[]) outState.getParcelableArray("tab_" + tabIndex + "_view_" + i));
+
+        return data;
+    }
+
     @Override
     public void loadData() {
-        ConnectivityManager cm =
-                (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+
         boolean isConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting();
 
         if (isConnected && dataLoadState == DATA_NOT_LOADED) {
@@ -108,6 +153,9 @@ public class TabletActivity extends Activity implements TaskCallbacks, LoadDataL
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (!isActiveTab())
+            return false;
+
         findViewById(R.id.focus_button).requestFocus();
 
         if (KeyEvent.KEYCODE_BACK == keyCode)
@@ -137,11 +185,13 @@ public class TabletActivity extends Activity implements TaskCallbacks, LoadDataL
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);
-        refreshMenuItem = menu.findItem(R.id.refresh);
         return true;
     }
 
     private void addProduct(String productId) {
+        if (!isActiveTab())
+            return;
+
         ProductItem product = productState.find(productId);
 
         if (product == null) {
@@ -153,18 +203,22 @@ public class TabletActivity extends Activity implements TaskCallbacks, LoadDataL
     }
 
     private void addProduct(ProductItem productItem) {
-        if (paragonControlComponent.addProduct(productItem))
+        if (!isActiveTab())
+            return;
+
+        if (getActive().addProduct(productItem))
             productState.takeProduct(productItem);
     }
 
 
-    public ProductViewLayout createParagon(MenuItem menuItem) {
-        return paragonControlComponent.createParagon();
+    public void createParagon(MenuItem menuItem) {
+        if (isActiveTab())
+            getActive().createParagon();
     }
 
     public void sendToServer(MenuItem menuItem) throws IOException {
         DataJsonService service = new DataJsonService();
-        String result = service.serializeParagons(paragonControlComponent.getData());
+        String result = service.serializeParagons(getActive().getData());
 
         TaskFragment<Void> mTaskFragment = cast(getFragmentManager().findFragmentByTag("task-upload"));
 
@@ -179,21 +233,12 @@ public class TabletActivity extends Activity implements TaskCallbacks, LoadDataL
         System.out.println(result);
     }
 
-    private void restoreState(ProductItem[] items) {
-        ProductViewLayout listView = createParagon(null);
-        listView.setItems(items);
-    }
-
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
-        List<ProductItem[]> data = paragonControlComponent.getData();
+        saveTabState(outState);
 
-        for (int i = 0; i < data.size(); i++)
-            outState.putParcelableArray("view_" + i, data.get(i));
-
-        outState.putInt("viewCount", data.size());
         outState.putParcelableArray("product_base_state", productState.getBaseState());
         outState.putStringArray("product_state", productState.getState());
         outState.putInt("loadDataState", dataLoadState);
@@ -204,10 +249,8 @@ public class TabletActivity extends Activity implements TaskCallbacks, LoadDataL
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-        int viewCount = savedInstanceState.getInt("viewCount");
 
-        for (int i = 0; i < viewCount; i++)
-            restoreState(this.<ProductItem[]>cast(savedInstanceState.getParcelableArray("view_" + i)));
+        restoreTabState(savedInstanceState);
 
         productState.setBaseState(this.<AvailableProductItem[]>cast(savedInstanceState.getParcelableArray("product_base_state")));
         productState.setState(savedInstanceState.getStringArray("product_state"));
@@ -256,15 +299,26 @@ public class TabletActivity extends Activity implements TaskCallbacks, LoadDataL
     }
 
     public void deleteProductItem(View view) {
-        ProductItem item = paragonControlComponent.deleteProductItem();
+        if (isActiveTab()) {
+            ProductItem item = getActive().deleteProductItem();
 
-        if (item != null)
-            productState.returnBack(item, 1);
+            if (item != null)
+                productState.returnBack(item, 1);
+        }
     }
 
 
     public void deleteParagon(MenuItem view) {
-        paragonControlComponent.deleteParagon();
+        if (isActiveTab())
+            getActive().deleteParagon();
+    }
+
+    private boolean isActiveTab() {
+        return getActionBar().getSelectedNavigationIndex() == 0;
+    }
+
+    private ActiveParagonViewFragment getActive() {
+        return this.cast(tabs.get(0));
     }
 
     @SuppressWarnings("unchecked")
@@ -275,10 +329,9 @@ public class TabletActivity extends Activity implements TaskCallbacks, LoadDataL
     @Override
     public void onPreExecute() {
         PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
-        PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
-                getClass().getName());
-        wl.acquire();
+        PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, getClass().getName());
 
+        wl.acquire();
     }
 
     @Override
@@ -310,11 +363,28 @@ public class TabletActivity extends Activity implements TaskCallbacks, LoadDataL
         }
 
         if (task instanceof UploadDataTask)
-            enableControl(false);
+            archiveParagon();
 
     }
 
-    private void enableControl(boolean enable) {
+    private void archiveParagon() {
+        ActionBar actionBar = getActionBar();
+        ParagonViewFragment tab = new ParagonViewFragment(getActive().getData());
+
+        ActionBar.Tab aTab = actionBar.newTab().setText("1").setTabListener(new TabListener(tab));
+        actionBar.addTab(aTab, 1);
+
+        tabs.add(1, tab);
+
+        //rename tab names
+        for (int i = 0; i < actionBar.getTabCount(); i++)
+            if (i != 0)
+                actionBar.getTabAt(i).setText(i + "");
+
+        getActive().reset();
+    }
+
+   /* private void enableControl(boolean enable) {
         findViewById(R.id.add_paragon).setEnabled(enable);
         findViewById(R.id.delete_paragon).setEnabled(enable);
         findViewById(R.id.send_product).setEnabled(enable);
@@ -323,12 +393,11 @@ public class TabletActivity extends Activity implements TaskCallbacks, LoadDataL
         findViewById(R.id.delete_product).setEnabled(enable);
 
         refreshMenuItem.setVisible(!enable);
-    }
+    }*/
 
     public void refresh(MenuItem menuItem) {
         dataLoadState = 0;
-        paragonControlComponent.reset();
-        enableControl(true);
+        getActive().reset();
         loadData();
     }
 
@@ -370,28 +439,12 @@ public class TabletActivity extends Activity implements TaskCallbacks, LoadDataL
         d.show();
     }
 
-    @Override
-    public void onTabSelected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
-      /*  // When the given tab is selected, show the tab contents in the
-        // container view.
-        Fragment fragment = new DummySectionFragment();
-        Bundle args = new Bundle();
-        args.putInt(DummySectionFragment.ARG_SECTION_NUMBER,
-                tab.getPosition() + 1);
-        fragment.setArguments(args);
-        getFragmentManager().beginTransaction()
-                .attach(fragment).commit();*/
-    }
-
-    @Override
-    public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
-
-    }
-
-    @Override
-    public void onTabReselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
-
+    public void close(MenuItem menuItem) {
+        finish();
+        System.exit(0);
     }
 
 }
+
+
 

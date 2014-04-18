@@ -1,8 +1,10 @@
 package org.menesty.ikea.tablet.component;
 
-import android.app.Activity;
+import android.app.Fragment;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -15,38 +17,50 @@ import org.menesty.ikea.tablet.listener.SlideListener;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by Menesty on 2/26/14.
- */
-public class ParagonControlComponent {
-    private int currentActiveParagonIndex = 0;
+public class ParagonViewFragment extends Fragment {
 
-    private Activity context;
+    private List<ProductItem[]> data;
+
+    public ParagonViewFragment(List<ProductItem[]> data) {
+        this.data = data;
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.paragon_view, container, false);
+        init(view);
+
+        return view;
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setRetainInstance(true);
+    }
+
+    private int currentActiveParagonIndex = 0;
 
     private View.OnTouchListener listViewOnTouchListener;
 
-    public ParagonControlComponent(Activity context) {
-        this.context = context;
-        init();
-    }
-
-    private void init() {
-        RadioGroup paragonGroup = (RadioGroup) (context.findViewById(R.id.paragon_group));
+    protected void init(final View view) {
+        RadioGroup paragonGroup = (RadioGroup) (view.findViewById(R.id.paragon_group));
         paragonGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
                 int index = group.indexOfChild(group.findViewById(checkedId));
+
                 if (currentActiveParagonIndex == index)
                     return;
 
-                ViewFlipper flipper = (ViewFlipper) (context.findViewById(R.id.listViewContainer));
+                ViewFlipper flipper = (ViewFlipper) (view.findViewById(R.id.listViewContainer));
 
                 if (currentActiveParagonIndex > index) {
-                    flipper.setInAnimation(AnimationUtils.loadAnimation(context, R.anim.go_prev_in));
-                    flipper.setOutAnimation(AnimationUtils.loadAnimation(context, R.anim.go_prev_out));
+                    flipper.setInAnimation(AnimationUtils.loadAnimation(getActivity(), R.anim.go_prev_in));
+                    flipper.setOutAnimation(AnimationUtils.loadAnimation(getActivity(), R.anim.go_prev_out));
                 } else {
-                    flipper.setInAnimation(AnimationUtils.loadAnimation(context, R.anim.go_next_in));
-                    flipper.setOutAnimation(AnimationUtils.loadAnimation(context, R.anim.go_next_out));
+                    flipper.setInAnimation(AnimationUtils.loadAnimation(getActivity(), R.anim.go_next_in));
+                    flipper.setOutAnimation(AnimationUtils.loadAnimation(getActivity(), R.anim.go_next_out));
                 }
 
                 flipper.setDisplayedChild(index);
@@ -65,10 +79,19 @@ public class ParagonControlComponent {
                 scrollFlipperView(-1);
             }
         };
+
+        if (data == null)
+            createParagon(view);
+        else
+            for (ProductItem[] items : data) {
+                ProductViewLayout listView = createParagon(view);
+                listView.setItems(items);
+            }
+
     }
 
     private void scrollFlipperView(int direction) {
-        RadioGroup paragonGroup = (RadioGroup) (context.findViewById(R.id.paragon_group));
+        RadioGroup paragonGroup = (RadioGroup) (getView().findViewById(R.id.paragon_group));
         View radioBox = paragonGroup.getChildAt(checkedRadioButtonIndex(paragonGroup) + direction);
 
         if (radioBox != null)
@@ -79,16 +102,19 @@ public class ParagonControlComponent {
         return group.indexOfChild(group.findViewById(group.getCheckedRadioButtonId()));
     }
 
-
     public ProductViewLayout createParagon() {
-        RadioGroup paragonGroup = (RadioGroup) (context.findViewById(R.id.paragon_group));
+        return createParagon(getView());
+    }
 
-        RadioButton currentRadio = new RadioButton(context);
+    public ProductViewLayout createParagon(final View view) {
+        RadioGroup paragonGroup = (RadioGroup) (view.findViewById(R.id.paragon_group));
+
+        RadioButton currentRadio = new RadioButton(getActivity());
         paragonGroup.addView(currentRadio);
 
-        ViewFlipper flipper = (ViewFlipper) (context.findViewById(R.id.listViewContainer));
+        ViewFlipper flipper = (ViewFlipper) (view.findViewById(R.id.listViewContainer));
 
-        ProductViewLayout productViewLayout = new ProductViewLayout(context, flipper) {
+        ProductViewLayout productViewLayout = new ProductViewLayout(getActivity(), flipper) {
             @Override
             public void onItemLongClick(ProductItem item) {
                 NumberDialog dialog = new NumberDialog();
@@ -97,7 +123,7 @@ public class ParagonControlComponent {
                 args.putString("productName", item.productName);
                 dialog.setArguments(args);
 
-                dialog.show(context.getFragmentManager(), "number-dialog");
+                dialog.show(getActivity().getFragmentManager(), "number-dialog");
             }
         };
         productViewLayout.setViewOnTouchListener(listViewOnTouchListener);
@@ -109,11 +135,11 @@ public class ParagonControlComponent {
     }
 
     public ProductViewLayout getActiveView() {
-        RadioGroup paragonGroup = (RadioGroup) (context.findViewById(R.id.paragon_group));
+        RadioGroup paragonGroup = (RadioGroup) (getView().findViewById(R.id.paragon_group));
         int index = checkedRadioButtonIndex(paragonGroup);
 
         if (index >= 0)
-            return (ProductViewLayout) (((ViewFlipper) context.findViewById(R.id.listViewContainer)).getChildAt(index));
+            return (ProductViewLayout) (((ViewFlipper) getView().findViewById(R.id.listViewContainer)).getChildAt(index));
 
         return null;
     }
@@ -147,12 +173,12 @@ public class ParagonControlComponent {
 
 
     public void deleteParagon() {
-        RadioGroup paragonGroup = (RadioGroup) (context.findViewById(R.id.paragon_group));
+        RadioGroup paragonGroup = (RadioGroup) (getView().findViewById(R.id.paragon_group));
         int index = checkedRadioButtonIndex(paragonGroup);
 
         if (index >= 0) {
             paragonGroup.removeViewAt(index);
-            ViewFlipper flipper = (ViewFlipper) (context.findViewById(R.id.listViewContainer));
+            ViewFlipper flipper = (ViewFlipper) (getView().findViewById(R.id.listViewContainer));
             flipper.removeViewAt(index);
 
             if (paragonGroup.getChildCount() != 0)
@@ -161,9 +187,12 @@ public class ParagonControlComponent {
     }
 
     public List<ProductItem[]> getData() {
+        if (!isAdded())
+            return data;
+
         List<ProductItem[]> result = new ArrayList<ProductItem[]>();
 
-        ViewFlipper flipper = (ViewFlipper) (context.findViewById(R.id.listViewContainer));
+        ViewFlipper flipper = (ViewFlipper) (getView().findViewById(R.id.listViewContainer));
 
         for (int i = 0; i < flipper.getChildCount(); i++)
             if (flipper.getChildAt(i) instanceof ProductViewLayout)
@@ -172,13 +201,24 @@ public class ParagonControlComponent {
         return result;
     }
 
+    public void persistState() {
+        this.data = getData();
+    }
+
     public void reset() {
-        ViewFlipper flipper = (ViewFlipper) (context.findViewById(R.id.listViewContainer));
+        ViewFlipper flipper = (ViewFlipper) (getView().findViewById(R.id.listViewContainer));
         flipper.removeAllViews();
 
-        RadioGroup paragonGroup = (RadioGroup) (context.findViewById(R.id.paragon_group));
+        RadioGroup paragonGroup = (RadioGroup) (getView().findViewById(R.id.paragon_group));
         paragonGroup.removeAllViews();
 
         createParagon();
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        /*persistState();
+        super.onDetach();*/
     }
 }

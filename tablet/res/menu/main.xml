@@ -27,7 +27,11 @@
     <item
             android:showAsAction="never|withText"
             android:onClick="settings"
-            android:title="Settings"
-            />
+            android:title="Settings" />
+
+    <item
+            android:showAsAction="never|withText"
+            android:onClick="close"
+            android:title="Exit" />
 
 </menu>
