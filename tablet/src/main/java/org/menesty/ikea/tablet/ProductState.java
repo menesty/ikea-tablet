@@ -41,7 +41,7 @@ public class ProductState {
                 count = count == null ? 0 : count;
 
                 if (count == 0 || count < productItem.count)
-                    return new ProductItem(productItem.productId, productItem.productName,  productItem.shortName, productItem.count - count, productItem.price, productItem.weight, productItem.orderId);
+                    return new ProductItem(productItem.productId, productItem.productName, productItem.shortName, productItem.count - count, productItem.price, productItem.weight, productItem.orderId);
 
             }
 
@@ -63,11 +63,11 @@ public class ProductState {
 
     }
 
-    private String getKey(ProductItem product){
+    private String getKey(ProductItem product) {
         return product.productName + "_" + product.price;
     }
 
-    private String getKey(AvailableProductItem productItem){
+    private String getKey(AvailableProductItem productItem) {
         return productItem.productName + "_" + productItem.price;
     }
 
@@ -111,5 +111,13 @@ public class ProductState {
         else
             state.put(key, c - count);
 
+    }
+
+    public void updateWeight(String productName, double weight) {
+        for (AvailableProductItem item : baseState)
+            if (item.productName.equals(productName)) {
+                item.weight = weight;
+                return;
+            }
     }
 }

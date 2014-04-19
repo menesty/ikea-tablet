@@ -7,25 +7,30 @@ import android.content.DialogInterface;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.widget.EditText;
-import org.menesty.ikea.tablet.R;
+import org.menesty.ikea.tablet.util.NumberUtil;
 
 public class NumberDialog extends DialogFragment implements DialogInterface.OnClickListener {
+    public interface ProductWeightChangeListener {
+        void onWeightChange(String productName, double weight);
+    }
+
+    private EditText editText;
+
     public NumberDialog() {
-          setRetainInstance(true);
+        setRetainInstance(true);
     }
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         AlertDialog.Builder adb = new AlertDialog.Builder(getActivity())
-                .setTitle("Problem connecting to internet").setPositiveButton("", this)
-                .setMessage(R.string.reloadDataInfo)
-                .setNegativeButton(R.string.settings, this);
+                .setTitle("Input new weight").setPositiveButton("Save", this)
+                .setNegativeButton("Cancel", this);
 
-        EditText editText = new EditText(getActivity());
+        editText = new EditText(getActivity());
         editText.setId(-12);
         editText.setRawInputType(Configuration.KEYBOARD_12KEY);
 
-        editText.setText(savedInstanceState.getDouble("weight", 0) + "");
+        editText.setText(getArguments().getDouble("weight", 0) + "");
 
         adb.setView(editText);
 
@@ -37,6 +42,12 @@ public class NumberDialog extends DialogFragment implements DialogInterface.OnCl
 
     @Override
     public void onClick(DialogInterface dialogInterface, int i) {
+        if (i == DialogInterface.BUTTON_POSITIVE) {
+            double result = NumberUtil.parse(editText.getText().toString());
+            ((ProductWeightChangeListener) getActivity()).onWeightChange(getArguments().getString("productName"), result);
+        }
+
         dismiss();
+
     }
 }

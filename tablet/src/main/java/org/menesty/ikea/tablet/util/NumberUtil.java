@@ -22,4 +22,12 @@ public class NumberUtil {
     public static double round(double value, int scale) {
         return BigDecimal.valueOf(value).setScale(scale, BigDecimal.ROUND_CEILING).doubleValue();
     }
+
+    public static double parse(String value) {
+        try {
+            return Double.valueOf(value.replaceAll("[^0-9.]+", ""));
+        } catch (NumberFormatException e) {
+            return 0d;
+        }
+    }
 }

@@ -19,6 +19,7 @@ import org.menesty.ikea.tablet.component.ActiveParagonViewFragment;
 import org.menesty.ikea.tablet.component.ParagonViewFragment;
 import org.menesty.ikea.tablet.data.DataJsonService;
 import org.menesty.ikea.tablet.dialog.InternetConnectionDialog;
+import org.menesty.ikea.tablet.dialog.NumberDialog;
 import org.menesty.ikea.tablet.dialog.ProductChoiceDialog;
 import org.menesty.ikea.tablet.domain.AvailableProductItem;
 import org.menesty.ikea.tablet.domain.ProductItem;
@@ -32,7 +33,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TabletActivity extends Activity implements TaskCallbacks, LoadDataListener {
+public class TabletActivity extends Activity implements TaskCallbacks, LoadDataListener, NumberDialog.ProductWeightChangeListener {
 
     private ProductIdKeyboardHandler productIdKeyboardHandler;
 
@@ -444,6 +445,14 @@ public class TabletActivity extends Activity implements TaskCallbacks, LoadDataL
         System.exit(0);
     }
 
+    @Override
+    public void onWeightChange(String productName, double weight) {
+        //update in state and already added
+        productState.updateWeight(productName, weight);
+
+        if (isActiveTab())
+            getActive().updateWeight(productName, weight);
+    }
 }
 
 

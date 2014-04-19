@@ -21,4 +21,9 @@ public class ActiveParagonViewFragment extends ParagonViewFragment {
         init(view);
         return view;
     }
+
+    @Override
+    protected boolean showEditWeightDialog() {
+        return true;
+    }
 }

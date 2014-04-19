@@ -117,6 +117,9 @@ public class ParagonViewFragment extends Fragment {
         ProductViewLayout productViewLayout = new ProductViewLayout(getActivity(), flipper) {
             @Override
             public void onItemLongClick(ProductItem item) {
+                if (!showEditWeightDialog())
+                    return;
+
                 NumberDialog dialog = new NumberDialog();
                 Bundle args = new Bundle();
                 args.putDouble("weight", item.weight);
@@ -134,6 +137,10 @@ public class ParagonViewFragment extends Fragment {
         return productViewLayout;
     }
 
+    protected boolean showEditWeightDialog() {
+        return false;
+    }
+
     public ProductViewLayout getActiveView() {
         RadioGroup paragonGroup = (RadioGroup) (getView().findViewById(R.id.paragon_group));
         int index = checkedRadioButtonIndex(paragonGroup);
@@ -143,6 +150,7 @@ public class ParagonViewFragment extends Fragment {
 
         return null;
     }
+
 
     public ProductItem deleteProductItem() {
         ProductViewLayout viewLayout = getActiveView();
@@ -171,6 +179,19 @@ public class ParagonViewFragment extends Fragment {
         return true;
     }
 
+    public void updateWeight(String productName, double weight) {
+        ViewFlipper flipper = (ViewFlipper) getView().findViewById(R.id.listViewContainer);
+
+        for (int i = 0; i < flipper.getChildCount(); i++) {
+            ProductViewLayout layout = (ProductViewLayout) flipper.getChildAt(i);
+            ProductItem item = layout.findByProductName(productName);
+
+            if (item != null) {
+                item.weight = weight;
+                layout.update(item);
+            }
+        }
+    }
 
     public void deleteParagon() {
         RadioGroup paragonGroup = (RadioGroup) (getView().findViewById(R.id.paragon_group));
@@ -213,12 +234,5 @@ public class ParagonViewFragment extends Fragment {
         paragonGroup.removeAllViews();
 
         createParagon();
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        /*persistState();
-        super.onDetach();*/
     }
 }
