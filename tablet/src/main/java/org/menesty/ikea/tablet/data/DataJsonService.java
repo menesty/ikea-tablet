@@ -113,6 +113,7 @@ public class DataJsonService {
                         writer.name("productNumber").value(item.productName);
                         writer.name("price").value(item.price);
                         writer.name("count").value(item.count);
+                        writer.name("weight").value(item.weight);
                         writer.endObject();
                     }
                 }
