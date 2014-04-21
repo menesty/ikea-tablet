@@ -177,11 +177,11 @@ public class AutoUpdateApk extends Observable {
     private BroadcastReceiver connectivity_receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            NetworkInfo currentNetworkInfo = (NetworkInfo) intent.getParcelableExtra(ConnectivityManager.EXTRA_NETWORK_INFO);
+            NetworkInfo currentNetworkInfo = intent.getParcelableExtra(ConnectivityManager.EXTRA_NETWORK_INFO);
 
             // do application-specific task(s) based on the current network state, such
             // as enabling queuing of HTTP requests when currentNetworkInfo is connected etc.
-            boolean not_mobile = currentNetworkInfo.getTypeName().equalsIgnoreCase("MOBILE") ? false : true;
+            boolean not_mobile = !currentNetworkInfo.getTypeName().equalsIgnoreCase("MOBILE");
             if( currentNetworkInfo.isConnected() && (mobile_updates || not_mobile) ) {
                 checkUpdates(false);
                 updateHandler.postDelayed(periodicUpdate, UPDATE_INTERVAL);

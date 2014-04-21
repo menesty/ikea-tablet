@@ -140,16 +140,20 @@ public class TabletActivity extends Activity implements TaskCallbacks, LoadDataL
 
             dataLoadState = DATA_LOADING;
             mTaskFragment.start(new LoadServerDataTask(), SettingService.getSetting(this));
-
         } else {
-            InternetConnectionDialog internetConnectionDialog = cast(getFragmentManager().findFragmentByTag("internetConnectionDialog"));
+            showInternetConnectionDialog(dataLoadState == DATA_LOADING);
 
-            if (internetConnectionDialog == null)
-                internetConnectionDialog = new InternetConnectionDialog();
-
-            getFragmentManager().beginTransaction().add(internetConnectionDialog, "internetConnectionDialog").commit();
             dataLoadState = DATA_NOT_LOADED;
         }
+    }
+
+    private void showInternetConnectionDialog(boolean serverError) {
+        InternetConnectionDialog internetConnectionDialog = cast(getFragmentManager().findFragmentByTag(InternetConnectionDialog.class.getName()));
+
+        if (internetConnectionDialog == null)
+            internetConnectionDialog = new InternetConnectionDialog(serverError);
+
+        getFragmentManager().beginTransaction().add(internetConnectionDialog, InternetConnectionDialog.class.getName()).commit();
     }
 
     @Override
@@ -221,10 +225,10 @@ public class TabletActivity extends Activity implements TaskCallbacks, LoadDataL
         DataJsonService service = new DataJsonService();
         String result = service.serializeParagons(getActive().getData());
 
-        TaskFragment<Void> mTaskFragment = cast(getFragmentManager().findFragmentByTag("task-upload"));
+        TaskFragment<Boolean> mTaskFragment = cast(getFragmentManager().findFragmentByTag("task-upload"));
 
         if (mTaskFragment == null)
-            mTaskFragment = new TaskFragment<Void>();
+            mTaskFragment = new TaskFragment<Boolean>();
 
         if (!mTaskFragment.isRunning()) {
             mTaskFragment.start(new UploadDataTask(), SettingService.getSetting(this), result);
@@ -363,8 +367,12 @@ public class TabletActivity extends Activity implements TaskCallbacks, LoadDataL
 
         }
 
-        if (task instanceof UploadDataTask)
-            archiveParagon();
+        if (task instanceof UploadDataTask) {
+            if (this.<Boolean>cast(result))
+                archiveParagon();
+            else
+                Toast.makeText(getBaseContext(), R.string.serverConnectionProblemMessage, Toast.LENGTH_LONG).show();
+        }
 
     }
 

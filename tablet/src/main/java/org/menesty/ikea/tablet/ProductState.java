@@ -28,7 +28,7 @@ public class ProductState {
                 count = count == null ? 0 : count;
 
                 if (count == 0 || count < productItem.count)
-                    productItems.add(new ProductItem(productItem.productId, productItem.productName, productItem.shortName, productItem.count - count, productItem.price, productItem.weight, productItem.orderId));
+                    productItems.add(new ProductItem(productItem.productId, productItem.productName, productItem.shortName, productItem.count - count, productItem.price, productItem.weight, productItem.orderId, productItem.checked));
             }
         }
         return productItems.toArray(new ProductItem[productItems.size()]);
@@ -41,7 +41,7 @@ public class ProductState {
                 count = count == null ? 0 : count;
 
                 if (count == 0 || count < productItem.count)
-                    return new ProductItem(productItem.productId, productItem.productName, productItem.shortName, productItem.count - count, productItem.price, productItem.weight, productItem.orderId);
+                    return new ProductItem(productItem.productId, productItem.productName, productItem.shortName, productItem.count - count, productItem.price, productItem.weight, productItem.orderId, productItem.checked);
 
             }
 

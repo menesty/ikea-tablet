@@ -2,9 +2,13 @@
 <resources>
     <string name="app_name">ikea-tablet</string>
     <string name="load_data_from_server">Load data from server ...</string>
-    <string name="reloadData">Try load data</string>
+    <string name="tryAgain">Try again</string>
+    <string name="internetConnectionProblemTitle">Problem connecting to internet</string>
+    <string name="serverConnectionProblemTitle">Problem connecting to server</string>
     <string name="settings">Settings</string>
+
     <string name="reloadDataInfo">You have not connection to internet, connect wifi or mobile internet and try again.</string>
+    <string name="serverConnectionProblemMessage">You have not connection to server, check correct address and try again.</string>
 
     <string name="pref_server_url">Server URL</string>
     <string name="pref_server_url_summ">Input server for sync</string>
@@ -15,5 +19,10 @@
 
     <string name="pref_user_password">User password URL</string>
     <string name="pref_user_password_summ">password user to auth to server for syn</string>
+
+    <string name="weight">Weight</string>
+    <string name="count">Count</string>
+    <string name="price">Price</string>
+    <string name="productId">ProductId</string>
 
 </resources>

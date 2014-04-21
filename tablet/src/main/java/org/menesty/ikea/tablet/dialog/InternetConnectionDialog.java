@@ -12,11 +12,21 @@ import org.menesty.ikea.tablet.TabletActivity;
  * Created by Menesty on 3/4/14.
  */
 public class InternetConnectionDialog extends DialogFragment implements DialogInterface.OnClickListener {
+    private boolean serverError;
+
+    public InternetConnectionDialog() {
+        this(false);
+    }
+
+    public InternetConnectionDialog(boolean serverError) {
+        this.serverError = serverError;
+        setRetainInstance(true);
+    }
 
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         AlertDialog.Builder adb = new AlertDialog.Builder(getActivity())
-                .setTitle("Problem connecting to internet").setPositiveButton(R.string.reloadData, this)
-                .setMessage(R.string.reloadDataInfo)
+                .setTitle(serverError ? R.string.serverConnectionProblemTitle : R.string.internetConnectionProblemTitle).setPositiveButton(R.string.tryAgain, this)
+                .setMessage(serverError ? R.string.serverConnectionProblemMessage : R.string.reloadDataInfo)
                 .setNegativeButton(R.string.settings, this);
         Dialog dialog = adb.create();
         dialog.setCanceledOnTouchOutside(false);

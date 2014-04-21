@@ -46,6 +46,7 @@ public class DataJsonService {
         boolean allowed = true;
         int orderId = 0;
         boolean visible = true;
+        boolean checked = false;
 
         reader.beginObject();
         while (reader.hasNext()) {
@@ -71,12 +72,15 @@ public class DataJsonService {
                 orderId = reader.nextInt();
             else if (name.equals("visible"))
                 visible = reader.nextString().equals("1");
+            else if(name.equals("checked"))
+                checked = reader.nextString().equals("1");
+
             else
                 reader.skipValue();
 
         }
         reader.endObject();
-        return new AvailableProductItem(productId, productName, shortName, count, price, weight, zestav, allowed, visible, orderId);
+        return new AvailableProductItem(productId, productName, shortName, count, price, weight, zestav, allowed, visible, orderId, checked);
     }
 
 

@@ -24,16 +24,15 @@ import java.net.URL;
 /**
  * Created by Menesty on 2/28/14.
  */
-public class UploadDataTask extends BaseAsyncTask<Object, Integer, Void> {
+public class UploadDataTask extends BaseAsyncTask<Object, Integer, Boolean> {
     @Override
-    protected Void doInBackground(Object... data) {
+    protected Boolean doInBackground(Object... data) {
         ApplicationPreferences setting = (ApplicationPreferences) data[0];
         String desUrl = setting.getServerName() + "/paragon/executeExport";
 
         try {
             AuthService authService = new AuthService();
             String authHeader = authService.authHeader(desUrl, setting.getUserName(), setting.getPassword(), "POST");
-
 
             HttpClient httpclient = new DefaultHttpClient();
             StringEntity se = new StringEntity((String) data[1]);
@@ -43,6 +42,7 @@ public class UploadDataTask extends BaseAsyncTask<Object, Integer, Void> {
             UsernamePasswordCredentials creds = new UsernamePasswordCredentials(setting.getUserName(), setting.getPassword());
             CredentialsProvider cp = new BasicCredentialsProvider();
             cp.setCredentials(scope, creds);
+
             HttpContext credContext = new BasicHttpContext();
             credContext.setAttribute(ClientContext.CREDS_PROVIDER, cp);
 
@@ -59,12 +59,11 @@ public class UploadDataTask extends BaseAsyncTask<Object, Integer, Void> {
             String result = convertInputStreamToString(inputStream);
             System.out.println(result);
 
-
         } catch (Exception e) {
             e.printStackTrace();
-            return null;
+            return false;
         }
-        return null;
+        return true;
     }
 
     private static String convertInputStreamToString(InputStream inputStream) throws IOException {

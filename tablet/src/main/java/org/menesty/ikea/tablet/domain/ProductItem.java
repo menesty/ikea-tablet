@@ -16,9 +16,13 @@ public class ProductItem implements Parcelable {
         weight = in.readDouble();
         orderId = in.readInt();
         shortName = in.readString();
+
+        boolean[] value;
+        in.readBooleanArray(value = new boolean[1]);
+        checked = value[0];
     }
 
-    public ProductItem(String productId, String productName, String shortName, double count, double price, double weight, int orderId) {
+    public ProductItem(String productId, String productName, String shortName, double count, double price, double weight, int orderId, boolean checked) {
         this.artNumber = productId;
         this.productName = productName;
         this.shortName = shortName;
@@ -26,6 +30,7 @@ public class ProductItem implements Parcelable {
         this.price = price;
         this.weight = weight;
         this.orderId = orderId;
+        this.checked = checked;
     }
 
     public String artNumber;
@@ -42,6 +47,8 @@ public class ProductItem implements Parcelable {
 
     public String shortName;
 
+    public boolean checked;
+
     @Override
     public int describeContents() {
         return 0;
@@ -56,5 +63,6 @@ public class ProductItem implements Parcelable {
         parcel.writeDouble(weight);
         parcel.writeInt(orderId);
         parcel.writeString(shortName);
+        parcel.writeBooleanArray(new boolean[]{checked});
     }
 }

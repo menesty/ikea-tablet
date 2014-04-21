@@ -4,7 +4,9 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 public class AvailableProductItem implements Parcelable {
-    public AvailableProductItem(String productId, String productName, String shortName, double count, double price, double weight, boolean zestav, boolean allowed, boolean visible, int orderId) {
+    public AvailableProductItem(String productId, String productName, String shortName, double count, double price,
+                                double weight, boolean zestav, boolean allowed, boolean visible, int orderId,
+                                boolean checked) {
         this.shortName = shortName;
         this.productId = productId;
         this.price = price;
@@ -15,7 +17,7 @@ public class AvailableProductItem implements Parcelable {
         this.allowed = allowed;
         this.visible = visible;
         this.orderId = orderId;
-
+        this.checked = checked;
     }
 
     public AvailableProductItem(Parcel in) {
@@ -25,13 +27,19 @@ public class AvailableProductItem implements Parcelable {
         price = in.readDouble();
         count = in.readDouble();
         weight = in.readDouble();
-        boolean[] value = new boolean[3];
-        in.readBooleanArray(value);
+
+        boolean[] value;
+        in.readBooleanArray(value = new boolean[4]);
+
         zestav = value[0];
         allowed = value[1];
         visible = value[2];
+        checked = value[3];
+
         orderId = in.readInt();
     }
+
+    public boolean checked;
 
     public boolean zestav;
 
@@ -68,7 +76,7 @@ public class AvailableProductItem implements Parcelable {
         parcel.writeDouble(price);
         parcel.writeDouble(count);
         parcel.writeDouble(weight);
-        parcel.writeBooleanArray(new boolean[]{zestav, allowed, visible});
+        parcel.writeBooleanArray(new boolean[]{zestav, allowed, visible, checked});
         parcel.writeInt(orderId);
     }
 }

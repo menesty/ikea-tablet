@@ -61,7 +61,13 @@ public class ProductArrayAdapter extends ArrayAdapter<ProductItem> {
         holder.price.setText(NumberUtil.toString(list.get(position).price));
         holder.weight.setText(NumberFormat.getInstance().format(list.get(position).weight) + " kg");
 
+        if (list.get(position).checked)
+            holder.weight.setBackgroundResource(R.color.green_light);
+        else
+            holder.weight.setBackground(holder.price.getBackground());
+
         int columnWidth = (int) (parent.getMeasuredWidth() * 0.1);
+
         holder.text.setMinWidth(parent.getMeasuredWidth() - columnWidth * 3);
         holder.price.setMinWidth(columnWidth);
         holder.count.setMinWidth(columnWidth);

@@ -16,7 +16,7 @@
             android:layout_height="wrap_content"
             android:paddingLeft="15dp"
             android:textSize="@dimen/product_item_text_size"
-            android:text="ProductId"
+            android:text="@string/productId"
             android:layout_weight="1"/>
 
     <TextView
@@ -26,7 +26,7 @@
             android:textSize="@dimen/product_item_text_size"
             android:paddingLeft="10dp"
             android:paddingRight="10dp"
-            android:text="Count"
+            android:text="@string/count"
             android:gravity="right"
             />
     <TextView
@@ -36,7 +36,7 @@
             android:textSize="@dimen/product_item_text_size"
             android:paddingLeft="10dp"
             android:paddingRight="10dp"
-            android:text="Weight"
+            android:text="@string/weight"
             android:gravity="right"
             />
     <TextView
@@ -46,7 +46,7 @@
             android:textSize="@dimen/product_item_text_size"
             android:paddingLeft="10dp"
             android:paddingRight="5dp"
-            android:text="Price"
+            android:text="@string/price"
             android:gravity="right"
             />
 

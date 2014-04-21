@@ -106,10 +106,9 @@ public class ProductAvailableAdapter extends ArrayAdapter<ProductItem> {
                 ArrayList<ProductItem> values = new ArrayList<ProductItem>(list);
                 int count = values.size();
 
-                ArrayList<ProductItem> newValues = new ArrayList(count);
+                ArrayList<ProductItem> newValues = new ArrayList<ProductItem>(count);
 
-                for (int i = 0; i < count; i++) {
-                    ProductItem item = values.get(i);
+                for (ProductItem item : values) {
                     if (item.productName.toLowerCase().contains(prefixString))
                         newValues.add(item);
                 }
