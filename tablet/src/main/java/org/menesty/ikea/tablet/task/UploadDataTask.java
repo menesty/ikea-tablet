@@ -12,7 +12,6 @@ import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
-import org.menesty.ikea.tablet.auth.AuthService;
 import org.menesty.ikea.tablet.domain.ApplicationPreferences;
 
 import java.io.BufferedReader;
@@ -31,9 +30,6 @@ public class UploadDataTask extends BaseAsyncTask<Object, Integer, Boolean> {
         String desUrl = setting.getServerName() + "/paragon/executeExport";
 
         try {
-            AuthService authService = new AuthService();
-            String authHeader = authService.authHeader(desUrl, setting.getUserName(), setting.getPassword(), "POST");
-
             HttpClient httpclient = new DefaultHttpClient();
             StringEntity se = new StringEntity((String) data[1]);
             URL url = new URL(desUrl);
@@ -51,7 +47,6 @@ public class UploadDataTask extends BaseAsyncTask<Object, Integer, Boolean> {
 
             httpPost.setHeader("Accept", "application/json");
             httpPost.setHeader("Content-type", "application/json");
-            httpPost.setHeader("Authorization", authHeader);
 
             HttpResponse httpResponse = httpclient.execute(httpPost, credContext);
 

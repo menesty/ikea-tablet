@@ -1,13 +1,22 @@
 package org.menesty.ikea.tablet.task;
 
-import org.menesty.ikea.tablet.auth.AuthService;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CredentialsProvider;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.protocol.ClientContext;
+import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.protocol.BasicHttpContext;
+import org.apache.http.protocol.HttpContext;
 import org.menesty.ikea.tablet.data.DataJsonService;
 import org.menesty.ikea.tablet.domain.ApplicationPreferences;
 import org.menesty.ikea.tablet.domain.AvailableProductItem;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.List;
 
@@ -17,40 +26,38 @@ public class LoadServerDataTask extends BaseAsyncTask<Object, Integer, List<Avai
     protected List<AvailableProductItem> doInBackground(Object... data) {
         ApplicationPreferences setting = (ApplicationPreferences) data[0];
 
-        InputStream input = null;
-        HttpURLConnection connection = null;
+        HttpClient httpclient;
 
         String desUrl = setting.getServerName() + "/storage/load";
 
-        AuthService authService = new AuthService();
         try {
+            httpclient = new DefaultHttpClient();
+
+            HttpConnectionParams.setConnectionTimeout(httpclient.getParams(), 8 * 1000);
+            HttpConnectionParams.setSoTimeout(httpclient.getParams(), 8 * 1000);
+
             URL url = new URL(desUrl);
-            connection = (HttpURLConnection) url.openConnection();
 
-            String authHeader = authService.authHeader(desUrl, setting.getUserName(), setting.getPassword(), "GET");
-            connection.setRequestProperty("Authorization", authHeader);
+            AuthScope scope = new AuthScope(url.getHost(), url.getPort());
+            UsernamePasswordCredentials creds = new UsernamePasswordCredentials(setting.getUserName(), setting.getPassword());
+            CredentialsProvider cp = new BasicCredentialsProvider();
+            cp.setCredentials(scope, creds);
 
-            connection.connect();
+            HttpContext credContext = new BasicHttpContext();
+            credContext.setAttribute(ClientContext.CREDS_PROVIDER, cp);
 
-            if (connection.getResponseCode() != HttpURLConnection.HTTP_OK)
+            HttpGet httpGet = new HttpGet(desUrl);
+            HttpResponse httpResponse = httpclient.execute(httpGet, credContext);
+
+            if (httpResponse.getStatusLine().getStatusCode() != HttpStatus.SC_OK)
                 return null;
 
-            input = connection.getInputStream();
             onProgressUpdate(100);
 
-            return new DataJsonService().parseProducts(input);
+            return new DataJsonService().parseProducts(httpResponse.getEntity().getContent());
         } catch (Exception e) {
             e.printStackTrace();
             return null;
-        } finally {
-            try {
-                if (input != null)
-                    input.close();
-            } catch (IOException ignored) {
-            }
-
-            if (connection != null)
-                connection.disconnect();
         }
     }
 

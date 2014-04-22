@@ -22,7 +22,7 @@ import java.text.NumberFormat;
 /**
  * Created by Menesty on 12/9/13.
  */
-public abstract class ProductViewLayout extends LinearLayout implements AdapterView.OnItemClickListener {
+public abstract class ProductViewLayout extends LinearLayout implements AdapterView.OnItemLongClickListener {
     private int selectedIndex = -1;
 
     public ProductViewLayout(Activity context, ViewGroup parent) {
@@ -45,7 +45,7 @@ public abstract class ProductViewLayout extends LinearLayout implements AdapterV
         listView.setSelector(R.drawable.listitem_selector);
 
         listView.setLongClickable(true);
-        listView.setOnItemClickListener(this);
+        listView.setOnItemLongClickListener(this);
 
         setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
     }
@@ -146,8 +146,9 @@ public abstract class ProductViewLayout extends LinearLayout implements AdapterV
     }
 
     @Override
-    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+    public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
         onItemLongClick(getSelected());
+        return false;
     }
 
     public abstract void onItemLongClick(ProductItem item);
