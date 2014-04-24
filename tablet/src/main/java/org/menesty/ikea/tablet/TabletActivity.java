@@ -1,11 +1,15 @@
 package org.menesty.ikea.tablet;
 
-import android.app.*;
+import android.app.ActionBar;
+import android.app.Activity;
+import android.app.Dialog;
+import android.app.FragmentManager;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.os.Parcel;
 import android.os.PowerManager;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -23,13 +27,10 @@ import org.menesty.ikea.tablet.dialog.NumberDialog;
 import org.menesty.ikea.tablet.dialog.ProductChoiceDialog;
 import org.menesty.ikea.tablet.domain.AvailableProductItem;
 import org.menesty.ikea.tablet.domain.ProductItem;
-import org.menesty.ikea.tablet.task.BaseAsyncTask;
-import org.menesty.ikea.tablet.task.LoadServerDataTask;
-import org.menesty.ikea.tablet.task.TaskCallbacks;
-import org.menesty.ikea.tablet.task.UploadDataTask;
+import org.menesty.ikea.tablet.task.*;
 import org.menesty.ikea.tablet.util.TaskFragment;
 
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -54,6 +55,22 @@ public class TabletActivity extends Activity implements TaskCallbacks, LoadDataL
     public TabletActivity() {
         instance = this;
 
+        Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+            @Override
+            public void uncaughtException(Thread thread, Throwable ex) {
+                StringWriter errors = new StringWriter();
+                ex.printStackTrace(new PrintWriter(errors));
+                ex.printStackTrace();
+                sendErrorReport(errors.toString());
+            }
+        });
+    }
+
+    private void sendErrorReport(String errorData) {
+        new ErrorDataTask().execute(SettingService.getSetting(this), errorData);
+        /*TaskFragment<Void> mTaskFragment = new TaskFragment<Void>(false, true);
+        mTaskFragment.start(new ErrorDataTask(), SettingService.getSetting(this), errorData);
+        getFragmentManager().beginTransaction().add(mTaskFragment, "send-error-" + UUID.randomUUID().toString()).commit();*/
     }
 
     public static TabletActivity get() {
@@ -69,7 +86,7 @@ public class TabletActivity extends Activity implements TaskCallbacks, LoadDataL
         ActionBar actionBar = getActionBar();
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
-        if (savedInstanceState == null) {
+        if (savedInstanceState == null && !fatalRestore()) {
             ActionBar.Tab tab = actionBar.newTab().setText("Active");
             tabs.add(new ActiveParagonViewFragment(null));
 
@@ -242,23 +259,22 @@ public class TabletActivity extends Activity implements TaskCallbacks, LoadDataL
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
-        saveTabState(outState);
-
-        outState.putParcelableArray("product_base_state", productState.getBaseState());
-        outState.putStringArray("product_state", productState.getState());
-        outState.putInt("loadDataState", dataLoadState);
+        saveApplicationState(outState);
 
         productIdKeyboardHandler.cancel();
+    }
+
+    private void saveApplicationState(Bundle state) {
+        saveTabState(state);
+
+        state.putParcelableArray("product_base_state", productState.getBaseState());
+        state.putStringArray("product_state", productState.getState());
+        state.putInt("loadDataState", dataLoadState);
     }
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-
-        restoreTabState(savedInstanceState);
-
-        productState.setBaseState(this.<AvailableProductItem[]>cast(savedInstanceState.getParcelableArray("product_base_state")));
-        productState.setState(savedInstanceState.getStringArray("product_state"));
 
         ProductChoiceDialog dialog = (ProductChoiceDialog) getFragmentManager().findFragmentByTag("ProductChoiceDialog");
 
@@ -272,11 +288,70 @@ public class TabletActivity extends Activity implements TaskCallbacks, LoadDataL
             });
         }
 
-        dataLoadState = savedInstanceState.getInt("loadDataState");
+        restoreApplicationState(savedInstanceState);
+    }
+
+    private void restoreApplicationState(Bundle state) {
+        restoreTabState(state);
+
+        productState.setBaseState(this.<AvailableProductItem[]>cast(state.getParcelableArray("product_base_state")));
+        productState.setState(state.getStringArray("product_state"));
+
+        dataLoadState = state.getInt("loadDataState");
 
         if (dataLoadState == DATA_NOT_LOADED)
             loadData();
     }
+
+    public void fatalClose() {
+        //save data to disk
+        Bundle bundle = new Bundle();
+        Parcel p = Parcel.obtain();
+        FileOutputStream outputStream;
+        try {
+            saveApplicationState(bundle);
+
+            bundle.writeToParcel(p, 0);
+
+            outputStream = openFileOutput("backup.data", Context.MODE_PRIVATE);
+            outputStream.write(p.marshall());
+            outputStream.flush();
+            outputStream.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            close(null);
+        }
+    }
+
+    public boolean fatalRestore() {
+        Parcel p = Parcel.obtain();
+        try {
+            FileInputStream fis = openFileInput("backup.data");
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+
+            while (fis.available() > 0)
+                bos.write(fis.read());
+
+            fis.close();
+            deleteFile("backup.data");
+
+            byte[] bytes = bos.toByteArray();
+
+            p.unmarshall(bytes, 0, bytes.length);
+            p.setDataPosition(0);
+
+            restoreApplicationState(p.readBundle(AvailableProductItem.class.getClassLoader()));
+            return true;
+        } catch (FileNotFoundException e) {
+            //skip
+        } catch (Exception e1) {
+            deleteFile("backup.data");
+        }
+
+        return false;
+    }
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {

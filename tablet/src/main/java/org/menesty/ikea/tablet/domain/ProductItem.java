@@ -65,4 +65,14 @@ public class ProductItem implements Parcelable {
         parcel.writeString(shortName);
         parcel.writeBooleanArray(new boolean[]{checked});
     }
+
+    public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {
+        public ProductItem createFromParcel(Parcel in) {
+            return new ProductItem(in);
+        }
+
+        public ProductItem[] newArray(int size) {
+            return new ProductItem[size];
+        }
+    };
 }

@@ -79,4 +79,14 @@ public class AvailableProductItem implements Parcelable {
         parcel.writeBooleanArray(new boolean[]{zestav, allowed, visible, checked});
         parcel.writeInt(orderId);
     }
+
+    public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {
+        public AvailableProductItem createFromParcel(Parcel in) {
+            return new AvailableProductItem(in);
+        }
+
+        public AvailableProductItem[] newArray(int size) {
+            return new AvailableProductItem[size];
+        }
+    };
 }
