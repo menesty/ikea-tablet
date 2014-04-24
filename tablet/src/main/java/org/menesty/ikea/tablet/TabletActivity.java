@@ -9,7 +9,6 @@ import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
-import android.os.Parcel;
 import android.os.PowerManager;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -27,14 +26,17 @@ import org.menesty.ikea.tablet.dialog.NumberDialog;
 import org.menesty.ikea.tablet.dialog.ProductChoiceDialog;
 import org.menesty.ikea.tablet.domain.AvailableProductItem;
 import org.menesty.ikea.tablet.domain.ProductItem;
-import org.menesty.ikea.tablet.task.*;
+import org.menesty.ikea.tablet.task.BaseAsyncTask;
+import org.menesty.ikea.tablet.task.LoadServerDataTask;
+import org.menesty.ikea.tablet.task.TaskCallbacks;
+import org.menesty.ikea.tablet.task.UploadDataTask;
 import org.menesty.ikea.tablet.util.TaskFragment;
 
-import java.io.*;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TabletActivity extends Activity implements TaskCallbacks, LoadDataListener, NumberDialog.ProductWeightChangeListener {
+public class TabletActivity extends BaseActivity implements TaskCallbacks, LoadDataListener, NumberDialog.ProductWeightChangeListener {
 
     private ProductIdKeyboardHandler productIdKeyboardHandler;
 
@@ -54,23 +56,6 @@ public class TabletActivity extends Activity implements TaskCallbacks, LoadDataL
 
     public TabletActivity() {
         instance = this;
-
-        Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
-            @Override
-            public void uncaughtException(Thread thread, Throwable ex) {
-                StringWriter errors = new StringWriter();
-                ex.printStackTrace(new PrintWriter(errors));
-                ex.printStackTrace();
-                sendErrorReport(errors.toString());
-            }
-        });
-    }
-
-    private void sendErrorReport(String errorData) {
-        new ErrorDataTask().execute(SettingService.getSetting(this), errorData);
-        /*TaskFragment<Void> mTaskFragment = new TaskFragment<Void>(false, true);
-        mTaskFragment.start(new ErrorDataTask(), SettingService.getSetting(this), errorData);
-        getFragmentManager().beginTransaction().add(mTaskFragment, "send-error-" + UUID.randomUUID().toString()).commit();*/
     }
 
     public static TabletActivity get() {
@@ -135,7 +120,7 @@ public class TabletActivity extends Activity implements TaskCallbacks, LoadDataL
         int viewCount = outState.getInt("tab_" + tabIndex + "_view_count");
 
         for (int i = 0; i < viewCount; i++)
-            data.add((ProductItem[]) outState.getParcelableArray("tab_" + tabIndex + "_view_" + i));
+            data.add(convert(ProductItem.class, outState.getParcelableArray("tab_" + tabIndex + "_view_" + i)));
 
         return data;
     }
@@ -264,7 +249,8 @@ public class TabletActivity extends Activity implements TaskCallbacks, LoadDataL
         productIdKeyboardHandler.cancel();
     }
 
-    private void saveApplicationState(Bundle state) {
+    @Override
+    protected void saveApplicationState(Bundle state) {
         saveTabState(state);
 
         state.putParcelableArray("product_base_state", productState.getBaseState());
@@ -291,65 +277,18 @@ public class TabletActivity extends Activity implements TaskCallbacks, LoadDataL
         restoreApplicationState(savedInstanceState);
     }
 
-    private void restoreApplicationState(Bundle state) {
+    @Override
+    protected void restoreApplicationState(Bundle state) {
         restoreTabState(state);
 
-        productState.setBaseState(this.<AvailableProductItem[]>cast(state.getParcelableArray("product_base_state")));
+        AvailableProductItem[] items = convert(AvailableProductItem.class, state.getParcelableArray("product_base_state"));
+        productState.setBaseState(items);
         productState.setState(state.getStringArray("product_state"));
 
         dataLoadState = state.getInt("loadDataState");
 
         if (dataLoadState == DATA_NOT_LOADED)
             loadData();
-    }
-
-    public void fatalClose() {
-        //save data to disk
-        Bundle bundle = new Bundle();
-        Parcel p = Parcel.obtain();
-        FileOutputStream outputStream;
-        try {
-            saveApplicationState(bundle);
-
-            bundle.writeToParcel(p, 0);
-
-            outputStream = openFileOutput("backup.data", Context.MODE_PRIVATE);
-            outputStream.write(p.marshall());
-            outputStream.flush();
-            outputStream.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            close(null);
-        }
-    }
-
-    public boolean fatalRestore() {
-        Parcel p = Parcel.obtain();
-        try {
-            FileInputStream fis = openFileInput("backup.data");
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
-
-            while (fis.available() > 0)
-                bos.write(fis.read());
-
-            fis.close();
-            deleteFile("backup.data");
-
-            byte[] bytes = bos.toByteArray();
-
-            p.unmarshall(bytes, 0, bytes.length);
-            p.setDataPosition(0);
-
-            restoreApplicationState(p.readBundle(AvailableProductItem.class.getClassLoader()));
-            return true;
-        } catch (FileNotFoundException e) {
-            //skip
-        } catch (Exception e1) {
-            deleteFile("backup.data");
-        }
-
-        return false;
     }
 
 
@@ -401,10 +340,6 @@ public class TabletActivity extends Activity implements TaskCallbacks, LoadDataL
         return this.cast(tabs.get(0));
     }
 
-    @SuppressWarnings("unchecked")
-    private <T> T cast(Object view) {
-        return (T) view;
-    }
 
     @Override
     public void onPreExecute() {
@@ -468,17 +403,6 @@ public class TabletActivity extends Activity implements TaskCallbacks, LoadDataL
         getActive().reset();
     }
 
-   /* private void enableControl(boolean enable) {
-        findViewById(R.id.add_paragon).setEnabled(enable);
-        findViewById(R.id.delete_paragon).setEnabled(enable);
-        findViewById(R.id.send_product).setEnabled(enable);
-
-        findViewById(R.id.show_product_dialog).setEnabled(enable);
-        findViewById(R.id.delete_product).setEnabled(enable);
-
-        refreshMenuItem.setVisible(!enable);
-    }*/
-
     public void refresh(MenuItem menuItem) {
         dataLoadState = 0;
         ActionBar actionBar = getActionBar();
@@ -530,10 +454,6 @@ public class TabletActivity extends Activity implements TaskCallbacks, LoadDataL
         d.show();
     }
 
-    public void close(MenuItem menuItem) {
-        finish();
-        System.exit(0);
-    }
 
     @Override
     public void onWeightChange(String productName, double weight) {

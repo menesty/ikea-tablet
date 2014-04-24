@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.widget.EditText;
+import org.menesty.ikea.tablet.R;
 import org.menesty.ikea.tablet.util.NumberUtil;
 
 public class NumberDialog extends DialogFragment implements DialogInterface.OnClickListener {
@@ -23,8 +24,8 @@ public class NumberDialog extends DialogFragment implements DialogInterface.OnCl
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         AlertDialog.Builder adb = new AlertDialog.Builder(getActivity())
-                .setTitle("Input new weight").setPositiveButton("Save", this)
-                .setNegativeButton("Cancel", this);
+                .setTitle("Input new weight").setPositiveButton(R.string.save, this)
+                .setNegativeButton(R.string.cancel, this);
 
         editText = new EditText(getActivity());
         editText.setId(-12);
@@ -42,6 +43,9 @@ public class NumberDialog extends DialogFragment implements DialogInterface.OnCl
 
     @Override
     public void onClick(DialogInterface dialogInterface, int i) {
+       /* if (true)
+            throw new RuntimeException("bla bal");*/
+
         if (i == DialogInterface.BUTTON_POSITIVE) {
             double result = NumberUtil.parse(editText.getText().toString());
             ((ProductWeightChangeListener) getActivity()).onWeightChange(getArguments().getString("productName"), result);

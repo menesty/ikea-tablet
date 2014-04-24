@@ -1,20 +1,13 @@
 package org.menesty.ikea.tablet.task;
 
 import org.apache.http.HttpResponse;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.protocol.ClientContext;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.protocol.BasicHttpContext;
-import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
 import org.menesty.ikea.tablet.TabletActivity;
 import org.menesty.ikea.tablet.domain.ApplicationPreferences;
+import org.menesty.ikea.tablet.util.HttpUtil;
 
 import java.net.URL;
 
@@ -28,17 +21,10 @@ public class ErrorDataTask extends BaseAsyncTask<Object, Integer, Void> {
         String desUrl = setting.getServerName() + "/error/tablet";
 
         try {
-            HttpClient httpclient = new DefaultHttpClient();
-            StringEntity se = new StringEntity((String) data[1]);
             URL url = new URL(desUrl);
+            HttpClient httpclient = HttpUtil.createClient();
+            StringEntity se = new StringEntity((String) data[1]);
 
-            AuthScope scope = new AuthScope(url.getHost(), url.getPort());
-            UsernamePasswordCredentials creds = new UsernamePasswordCredentials(setting.getUserName(), setting.getPassword());
-            CredentialsProvider cp = new BasicCredentialsProvider();
-            cp.setCredentials(scope, creds);
-
-            HttpContext credContext = new BasicHttpContext();
-            credContext.setAttribute(ClientContext.CREDS_PROVIDER, cp);
 
             HttpPost httpPost = new HttpPost(desUrl);
             httpPost.setEntity(se);
@@ -46,7 +32,7 @@ public class ErrorDataTask extends BaseAsyncTask<Object, Integer, Void> {
             httpPost.setHeader("Accept", "application/json");
             httpPost.setHeader("Content-type", "application/json");
 
-            HttpResponse httpResponse = httpclient.execute(httpPost, credContext);
+            HttpResponse httpResponse = httpclient.execute(httpPost, HttpUtil.createAuthContext(url, setting));
 
             String result = EntityUtils.toString(httpResponse.getEntity());
             System.out.println(result);
