@@ -406,6 +406,13 @@ public class TabletActivity extends Activity implements TaskCallbacks, LoadDataL
 
     public void refresh(MenuItem menuItem) {
         dataLoadState = 0;
+        ActionBar actionBar = getActionBar();
+
+        while (tabs.size() > 1) {
+            tabs.remove(1);
+            actionBar.removeTabAt(1);
+        }
+
         getActive().reset();
         loadData();
     }

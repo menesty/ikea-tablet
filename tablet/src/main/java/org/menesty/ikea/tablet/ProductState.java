@@ -115,9 +115,7 @@ public class ProductState {
 
     public void updateWeight(String productName, double weight) {
         for (AvailableProductItem item : baseState)
-            if (item.productName.equals(productName)) {
+            if (item.productName.equals(productName))
                 item.weight = weight;
-                return;
-            }
     }
 }

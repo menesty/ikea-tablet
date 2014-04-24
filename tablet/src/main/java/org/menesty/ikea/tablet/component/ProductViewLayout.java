@@ -18,6 +18,8 @@ import org.menesty.ikea.tablet.domain.ProductItem;
 
 import java.math.BigDecimal;
 import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Menesty on 12/9/13.
@@ -127,7 +129,7 @@ public abstract class ProductViewLayout extends LinearLayout implements AdapterV
         ProductItem selected = getSelected();
 
         for (ProductItem item : getAdapter().getItems()) {
-            if (item.artNumber.equals(updateItem.artNumber)) {
+            if (item.productName.equals(updateItem.productName) && item.price == updateItem.price) {
                 if (updateItem.count <= 0) {
                     adapter.remove(item);
 
@@ -153,11 +155,13 @@ public abstract class ProductViewLayout extends LinearLayout implements AdapterV
 
     public abstract void onItemLongClick(ProductItem item);
 
-    public ProductItem findByProductName(String productName) {
+    public List<ProductItem> findByProductName(String productName) {
+        List<ProductItem> result = new ArrayList<ProductItem>();
+
         for (ProductItem item : getAdapter().getItems())
             if (item.productName.equals(productName))
-                return item;
+                result.add(item);
 
-        return null;
+        return result;
     }
 }

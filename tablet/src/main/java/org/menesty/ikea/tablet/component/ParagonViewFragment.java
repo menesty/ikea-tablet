@@ -184,12 +184,13 @@ public class ParagonViewFragment extends Fragment {
 
         for (int i = 0; i < flipper.getChildCount(); i++) {
             ProductViewLayout layout = (ProductViewLayout) flipper.getChildAt(i);
-            ProductItem item = layout.findByProductName(productName);
+            List<ProductItem> items = layout.findByProductName(productName);
 
-            if (item != null) {
-                item.weight = weight;
-                layout.update(item);
-            }
+            if (items.size() != 0)
+                for (ProductItem item : items) {
+                    item.weight = weight;
+                    layout.update(item);
+                }
         }
     }
 
