@@ -88,7 +88,7 @@ public class ProductArrayAdapter extends ArrayAdapter<ProductItem> {
     @Override
     public void add(ProductItem object) {
         for (ProductItem item : getItems())
-            if (item.artNumber.equals(object.artNumber) && item.price == object.price) {
+            if (item.productName.equals(object.productName) && item.price == object.price) {
                 item.count += object.count;
                 notifyDataSetChanged();
                 return;
