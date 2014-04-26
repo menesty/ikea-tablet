@@ -5,7 +5,7 @@
                   android:layout_height="wrap_content">
 
     <PreferenceCategory
-            android:title="server configuration"
+            android:title="@string/server_configuration"
             android:key="pref_key_storage_settings">
 
         <EditTextPreference
@@ -25,5 +25,14 @@
                 android:summary="@string/pref_user_password_summ"
                 android:title="@string/pref_user_password"
                 android:defaultValue="" />
+
+        <ListPreference
+                android:title="@string/language"
+                android:summary="@string/language_sum"
+                android:key="pref_user_language"
+                android:defaultValue="en"
+                android:entries="@array/languageListNames"
+                android:entryValues="@array/languageListValues" />
+
     </PreferenceCategory>
 </PreferenceScreen>

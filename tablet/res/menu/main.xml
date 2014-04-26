@@ -4,12 +4,12 @@
             android:id="@+id/add_paragon"
             android:icon="@drawable/ic_action_new_light"
             android:showAsAction="always|withText"
-            android:title="Add Paragon"
+            android:title="@string/add_paragon"
             android:onClick="createParagon"/>
     <item
             android:id="@+id/delete_paragon"
             android:icon="@drawable/ic_action_remove_light"
-            android:title="Delete paragon"
+            android:title="@string/delete_paragon"
             android:showAsAction="always|withText"
             android:onClick="deleteParagon"/>
     <item
@@ -21,18 +21,18 @@
     <item
             android:showAsAction="never|withText"
             android:onClick="settings"
-            android:title="Settings" />
+            android:title="@string/settings" />
 
     <item
             android:id="@+id/refresh"
             android:icon="@drawable/ic_action_refresh"
             android:showAsAction="never|withText"
-            android:title="Refresh"
+            android:title="@string/refresh"
             android:onClick="refresh" />
 
     <item
             android:showAsAction="never|withText"
             android:onClick="close"
-            android:title="Exit" />
+            android:title="@string/exit" />
 
 </menu>

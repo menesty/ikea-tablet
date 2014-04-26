@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">ikea-tablet</string>
+    <string name="app_name">Ikea Warehouse</string>
     <string name="load_data_from_server">Load data from server ...</string>
     <string name="tryAgain">Try again</string>
     <string name="internetConnectionProblemTitle">Problem connecting to internet</string>
@@ -26,5 +26,16 @@
     <string name="productId">ProductId</string>
     <string name="save">Save</string>
     <string name="cancel">Cancel</string>
+    <string name="language">Language</string>
+    <string name="language_sum">Language Interface</string>
+    <string name="server_configuration">Server configuration</string>
+
+    <string name="add_paragon">Add Paragon</string>
+    <string name="delete_paragon">Delete paragon</string>
+    <string name="refresh">Refresh</string>
+    <string name="exit">Exit</string>
+
+    <string name="loading">Loading</string>
+    <string name="wait_msg">Please wait a moment!</string>
 
 </resources>

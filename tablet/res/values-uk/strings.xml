@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Ikea Склад</string>
+    <string name="load_data_from_server">Загрузка даних з сервера ...</string>
+    <string name="tryAgain">Щераз</string>
+    <string name="internetConnectionProblemTitle">Проблеми підключення до інтернету</string>
+    <string name="serverConnectionProblemTitle">Проблеми підключення до серверу</string>
+    <string name="settings">Налаштування</string>
+
+    <string name="reloadDataInfo">Відсутнє підключення до інтернету, підключиться до wifi чи mobile інтернет і спробуйте ще раз.</string>
+    <string name="serverConnectionProblemMessage">Помилка підключення до сервера, перевірте правільність адреси і спробуйте ще раз.</string>
+
+    <string name="pref_server_url">Сервер URL</string>
+    <string name="pref_server_url_summ">Введіть адресу серверу для синхронізації</string>
+
+    <string name="pref_user_login">Користувач</string>
+    <string name="pref_user_login_summ">Користувач для авторизації</string>
+
+    <string name="pref_user_password">Пароль користувача</string>
+    <string name="pref_user_password_summ">Пароль для авторизації</string>
+
+    <string name="weight">Вага</string>
+    <string name="count">К-сть</string>
+    <string name="price">Ціна</string>
+    <string name="productId">ProductId</string>
+    <string name="save">Зберегти</string>
+    <string name="cancel">Відмінити</string>
+    <string name="language">Мова</string>
+    <string name="language_sum">Мова інтерфейсу</string>
+    <string name="server_configuration">Налаштування Сервера</string>
+
+    <string name="add_paragon">Додати Парагон</string>
+    <string name="delete_paragon">Видалити Парагон</string>
+    <string name="refresh">Оновити</string>
+    <string name="exit">Вихід</string>
+
+    <string name="loading">Завантаження</string>
+    <string name="wait_msg">Зачекайте хвильку!</string>
+</resources>

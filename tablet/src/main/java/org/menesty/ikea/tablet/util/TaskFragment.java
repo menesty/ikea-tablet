@@ -5,6 +5,7 @@ import android.app.ProgressDialog;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import org.menesty.ikea.tablet.R;
 import org.menesty.ikea.tablet.task.BaseAsyncTask;
 import org.menesty.ikea.tablet.task.TaskCallbacks;
 import org.menesty.ikea.tablet.task.TaskListener;
@@ -68,7 +69,8 @@ public class TaskFragment<Result> extends Fragment implements TaskListener<Resul
     }
 
     private void showDialog() {
-        progressDialog = ProgressDialog.show(getActivity(), "Loading", "Please wait a moment!");
+        progressDialog = ProgressDialog.show(getActivity(), getResources().getString(R.string.loading),
+                getResources().getString(R.string.wait_msg));
         dialogShowed = true;
     }
 

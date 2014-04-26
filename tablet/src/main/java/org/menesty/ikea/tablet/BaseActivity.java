@@ -2,20 +2,26 @@ package org.menesty.ikea.tablet;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.util.DisplayMetrics;
 import android.view.MenuItem;
 import org.menesty.ikea.tablet.domain.AvailableProductItem;
 import org.menesty.ikea.tablet.task.ErrorDataTask;
 
 import java.io.*;
 import java.lang.reflect.Array;
+import java.util.Locale;
 
 public abstract class BaseActivity extends Activity {
     private static final String BACKUP_DATA_FILE = "backup.data";
 
     public BaseActivity() {
+        SettingService.init(this);
+
         Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
             @Override
             public void uncaughtException(Thread thread, Throwable ex) {
@@ -25,6 +31,27 @@ public abstract class BaseActivity extends Activity {
                 sendErrorReport(errors.toString());
             }
         });
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        initDefaultLanguage();
+    }
+
+    private void initDefaultLanguage() {
+        Locale locale = SettingService.getSetting(this).getLanguage();
+
+        Locale.setDefault(locale);
+
+        Resources res = getResources();
+        res.getConfiguration().locale = locale;
+
+        DisplayMetrics dm = res.getDisplayMetrics();
+        Configuration conf = res.getConfiguration();
+        conf.locale = locale;
+        res.updateConfiguration(conf, dm);
+
     }
 
     private void sendErrorReport(String errorData) {
