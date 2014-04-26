@@ -387,8 +387,12 @@ public class TabletActivity extends BaseActivity implements TaskCallbacks, LoadD
         if (task instanceof UploadDataTask) {
             if (this.<Boolean>cast(result))
                 archiveParagon();
-            else
+            else {
                 Toast.makeText(getBaseContext(), R.string.serverConnectionProblemMessage, Toast.LENGTH_LONG).show();
+
+                TaskFragment<Boolean> mTaskFragment = cast(getFragmentManager().findFragmentByTag("task-upload"));
+                getFragmentManager().beginTransaction().remove(mTaskFragment).commit();
+            }
         }
 
     }

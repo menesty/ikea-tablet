@@ -117,7 +117,7 @@ public abstract class BaseActivity extends Activity {
     }
 
     @SuppressWarnings("unchecked")
-    protected <T> T[] convert(Class<T> claszz, Parcelable[] data) {
+    public static <T> T[] convert(Class<T> claszz, Parcelable[] data) {
         Object array = Array.newInstance(claszz, data.length);
 
         T[] afterCasting = (T[]) array;
@@ -129,7 +129,7 @@ public abstract class BaseActivity extends Activity {
     }
 
     @SuppressWarnings("unchecked")
-    protected <T> T cast(Object view) {
+    public static <T> T cast(Object view) {
         return (T) view;
     }
 

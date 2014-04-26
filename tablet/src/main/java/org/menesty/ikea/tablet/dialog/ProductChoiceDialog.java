@@ -15,6 +15,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import org.menesty.ikea.tablet.BaseActivity;
 import org.menesty.ikea.tablet.R;
 import org.menesty.ikea.tablet.addapter.ProductAvailableAdapter;
 import org.menesty.ikea.tablet.domain.ProductItem;
@@ -38,7 +39,7 @@ public class ProductChoiceDialog extends DialogFragment {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         if (savedInstanceState != null)
-            products = (ProductItem[]) (savedInstanceState.getParcelableArray("product_item_dialog"));
+            products = BaseActivity.convert(ProductItem.class, savedInstanceState.getParcelableArray("product_item_dialog"));
 
         final ProductAvailableAdapter adapter = new ProductAvailableAdapter(getActivity());
         adapter.addAll(products);
