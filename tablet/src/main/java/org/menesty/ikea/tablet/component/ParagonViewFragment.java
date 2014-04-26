@@ -21,7 +21,11 @@ public class ParagonViewFragment extends Fragment {
 
     private List<ProductItem[]> data;
 
+    public ParagonViewFragment() {
+    }
+
     public ParagonViewFragment(List<ProductItem[]> data) {
+        this();
         this.data = data;
     }
 

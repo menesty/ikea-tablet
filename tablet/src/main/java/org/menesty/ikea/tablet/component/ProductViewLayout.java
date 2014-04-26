@@ -149,7 +149,7 @@ public abstract class ProductViewLayout extends LinearLayout implements AdapterV
 
     @Override
     public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
-        onItemLongClick(getSelected());
+        onItemLongClick(getAdapter().getItem(i));
         return false;
     }
 

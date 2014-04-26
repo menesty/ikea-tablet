@@ -56,7 +56,7 @@ public class ProductArrayAdapter extends ArrayAdapter<ProductItem> {
 
         ViewHolder holder = (ViewHolder) view.getTag();
 
-        holder.text.setText(list.get(position).productName);
+        holder.text.setText(list.get(position).productName.toUpperCase().replaceAll("IKEA_", ""));
         holder.count.setText(NumberUtil.toString(list.get(position).count));
         holder.price.setText(NumberUtil.toString(list.get(position).price));
         holder.weight.setText(NumberFormat.getInstance().format(list.get(position).weight) + " kg");

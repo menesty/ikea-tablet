@@ -11,6 +11,10 @@ import java.util.List;
 
 public class ActiveParagonViewFragment extends ParagonViewFragment {
 
+    public ActiveParagonViewFragment(){
+
+    }
+
     public ActiveParagonViewFragment(List<ProductItem[]> data) {
         super(data);
     }

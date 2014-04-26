@@ -70,7 +70,7 @@ public class ProductAvailableAdapter extends ArrayAdapter<ProductItem> {
 
 
         ProductItem item = getItem(position);
-        holder.productId.setText(item.productName);
+        holder.productId.setText(item.productName.toUpperCase().replaceAll("IKEA_", ""));
         holder.count.setText(NumberUtil.toString(item.count));
 
         return convertView;

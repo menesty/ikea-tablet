@@ -100,7 +100,7 @@ public class ProductState {
     }
 
     public void returnBack(ProductItem product, double count) {
-        String key = product.productName + "_" + product.price;
+        String key = getKey(product);
         Double c = state.get(key);
 
         if (c == null)

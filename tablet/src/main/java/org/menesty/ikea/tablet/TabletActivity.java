@@ -70,15 +70,18 @@ public class TabletActivity extends BaseActivity implements TaskCallbacks, LoadD
 
         ActionBar actionBar = getActionBar();
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+        actionBar.setDisplayShowTitleEnabled(false);
 
-        if (savedInstanceState == null && !fatalRestore()) {
-            ActionBar.Tab tab = actionBar.newTab().setText("Active");
-            tabs.add(new ActiveParagonViewFragment(null));
+        if (savedInstanceState == null) {
+            if (!fatalRestore() || tabs.size() == 0) {
+                ActionBar.Tab tab = actionBar.newTab().setText("Active");
+                tabs.add(new ActiveParagonViewFragment(null));
 
-            tab.setTabListener(new TabListener(tabs.get(0)));
-            actionBar.addTab(tab);
+                tab.setTabListener(new TabListener(tabs.get(0)));
+                actionBar.addTab(tab);
 
-            loadData();
+                loadData();
+            }
         }
     }
 
@@ -322,7 +325,11 @@ public class TabletActivity extends BaseActivity implements TaskCallbacks, LoadD
             ProductItem item = getActive().deleteProductItem();
 
             if (item != null)
-                productState.returnBack(item, 1);
+                try {
+                    productState.returnBack(item, 1);
+                } catch (Exception e) {
+                    Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
+                }
         }
     }
 

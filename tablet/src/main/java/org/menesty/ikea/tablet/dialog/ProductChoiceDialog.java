@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -102,7 +103,15 @@ public class ProductChoiceDialog extends DialogFragment {
             }
         });
         // Create the AlertDialog object and return it
-        return builder.create();
+        Dialog d = builder.create();
+
+        WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
+        lp.copyFrom(d.getWindow().getAttributes());
+        lp.width = WindowManager.LayoutParams.MATCH_PARENT;
+        lp.height = WindowManager.LayoutParams.MATCH_PARENT;
+        d.getWindow().setAttributes(lp);
+
+        return d;
     }
 
     public void setListener(ItemSelectListener listener) {
