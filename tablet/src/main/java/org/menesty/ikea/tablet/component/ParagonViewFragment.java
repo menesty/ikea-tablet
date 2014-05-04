@@ -193,6 +193,7 @@ public class ParagonViewFragment extends Fragment {
             if (items.size() != 0)
                 for (ProductItem item : items) {
                     item.weight = weight;
+                    item.checked = true;
                     layout.update(item);
                 }
         }

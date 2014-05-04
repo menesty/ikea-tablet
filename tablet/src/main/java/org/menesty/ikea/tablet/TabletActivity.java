@@ -227,6 +227,8 @@ public class TabletActivity extends BaseActivity implements TaskCallbacks, LoadD
     }
 
     public void sendToServer(MenuItem menuItem) throws IOException {
+        enableControl(false);
+
         DataJsonService service = new DataJsonService();
         String result = service.serializeParagons(getActive().getData());
 
@@ -241,6 +243,16 @@ public class TabletActivity extends BaseActivity implements TaskCallbacks, LoadD
         }
 
         System.out.println(result);
+    }
+
+    private void enableControl(boolean enable) {
+        findViewById(R.id.add_paragon).setEnabled(enable);
+        findViewById(R.id.delete_paragon).setEnabled(enable);
+        findViewById(R.id.send_product).setEnabled(enable);
+
+     /*   findViewById(R.id.show_product_dialog).setEnabled(enable);
+        findViewById(R.id.delete_product).setEnabled(enable);
+*/
     }
 
     @Override
@@ -393,6 +405,8 @@ public class TabletActivity extends BaseActivity implements TaskCallbacks, LoadD
                 TaskFragment<Boolean> mTaskFragment = cast(getFragmentManager().findFragmentByTag("task-upload"));
                 getFragmentManager().beginTransaction().remove(mTaskFragment).commit();
             }
+
+            enableControl(true);
         }
 
     }
