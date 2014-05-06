@@ -36,4 +36,5 @@
 
     <string name="loading">Завантаження</string>
     <string name="wait_msg">Зачекайте хвильку!</string>
+    <string name="productNotAvailable">Даний товар не замовлявся, повідомте Ярослава</string>
 </resources>

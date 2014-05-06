@@ -37,5 +37,6 @@
 
     <string name="loading">Loading</string>
     <string name="wait_msg">Please wait a moment!</string>
+    <string name="productNotAvailable">Product not available in order</string>
 
 </resources>

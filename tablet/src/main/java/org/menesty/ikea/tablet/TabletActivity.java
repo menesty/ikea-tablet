@@ -205,7 +205,7 @@ public class TabletActivity extends BaseActivity implements TaskCallbacks, LoadD
         ProductItem product = productState.find(productId);
 
         if (product == null) {
-            Toast.makeText(getApplicationContext(), "Product not available in order", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), R.string.productNotAvailable, Toast.LENGTH_SHORT).show();
             return;
         }
 
