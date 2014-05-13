@@ -11,12 +11,12 @@ import java.util.List;
 
 public class ActiveParagonViewFragment extends ParagonViewFragment {
 
-    public ActiveParagonViewFragment(){
+    public ActiveParagonViewFragment() {
 
     }
 
-    public ActiveParagonViewFragment(List<ProductItem[]> data) {
-        super(data);
+    public ActiveParagonViewFragment(String uuid, List<ProductItem[]> data) {
+        super(uuid, data);
     }
 
     @Override

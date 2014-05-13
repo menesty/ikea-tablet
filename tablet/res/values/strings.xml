@@ -38,5 +38,7 @@
     <string name="loading">Loading</string>
     <string name="wait_msg">Please wait a moment!</string>
     <string name="productNotAvailable">Product not available in order</string>
+    <string name="paragonSendProblem">Call Jarek have problem with internet or server is down</string>
+
 
 </resources>

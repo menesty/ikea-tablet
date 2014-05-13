@@ -19,14 +19,21 @@ import java.util.List;
 
 public class ParagonViewFragment extends Fragment {
 
+    public final String UUID;
+
     private List<ProductItem[]> data;
 
     public ParagonViewFragment() {
+        UUID = generateUUID();
     }
 
-    public ParagonViewFragment(List<ProductItem[]> data) {
-        this();
+    public ParagonViewFragment(String uuid, List<ProductItem[]> data) {
+        UUID = uuid;
         this.data = data;
+    }
+
+    public static String generateUUID(){
+        return java.util.UUID.randomUUID().toString();
     }
 
     @Override
@@ -233,6 +240,11 @@ public class ParagonViewFragment extends Fragment {
     }
 
     public void reset() {
+        data = null;
+
+        if (getView() == null)
+            return;
+
         ViewFlipper flipper = (ViewFlipper) (getView().findViewById(R.id.listViewContainer));
         flipper.removeAllViews();
 

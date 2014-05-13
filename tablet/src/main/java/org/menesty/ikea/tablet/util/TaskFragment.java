@@ -108,7 +108,6 @@ public class TaskFragment<Result> extends Fragment implements TaskListener<Resul
             getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         else
             getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-
     }
 
     private void unlockScreenOrientation() {

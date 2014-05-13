@@ -7,8 +7,12 @@
     <string name="serverConnectionProblemTitle">Проблеми підключення до серверу</string>
     <string name="settings">Налаштування</string>
 
-    <string name="reloadDataInfo">Відсутнє підключення до інтернету, підключиться до wifi чи mobile інтернет і спробуйте ще раз.</string>
-    <string name="serverConnectionProblemMessage">Помилка підключення до сервера, перевірте правільність адреси і спробуйте ще раз.</string>
+    <string name="reloadDataInfo">Відсутнє підключення до інтернету, підключиться до wifi чи mobile інтернет і спробуйте
+        ще раз.
+    </string>
+    <string name="serverConnectionProblemMessage">Помилка підключення до сервера, перевірте правільність адреси і
+        спробуйте ще раз.
+    </string>
 
     <string name="pref_server_url">Сервер URL</string>
     <string name="pref_server_url_summ">Введіть адресу серверу для синхронізації</string>
@@ -37,4 +41,6 @@
     <string name="loading">Завантаження</string>
     <string name="wait_msg">Зачекайте хвильку!</string>
     <string name="productNotAvailable">Даний товар не замовлявся, повідомте Ярослава</string>
+    <string name="paragonSendProblem">З технічних причин парагодни не відправлені, повідомте Ярослава</string>
+
 </resources>

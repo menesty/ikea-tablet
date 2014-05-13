@@ -84,13 +84,14 @@ public class DataJsonService {
     }
 
 
-    public String serializeParagons(List<ProductItem[]> data) {
+    public String serializeParagons(String actionId, List<ProductItem[]> data) {
         StringWriter sw = new StringWriter();
         try {
             JsonWriter writer = new JsonWriter(sw);
 
             writer.beginObject();
             writer.name("driverId").value(1);
+            writer.name("actionId").value(actionId);
             writer.name("paragons");
 
             writer.beginArray();
