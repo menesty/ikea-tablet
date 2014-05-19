@@ -72,7 +72,7 @@ public class DataJsonService {
                 orderId = reader.nextInt();
             else if (name.equals("visible"))
                 visible = reader.nextString().equals("1");
-            else if(name.equals("checked"))
+            else if (name.equals("checked"))
                 checked = reader.nextString().equals("1");
 
             else
@@ -99,7 +99,7 @@ public class DataJsonService {
             for (int i = 0; i < data.size(); i++) {
                 ProductItem[] items = data.get(i);
 
-                if(items.length == 0)
+                if (items.length == 0)
                     continue;
 
                 writer.beginObject();
@@ -110,15 +110,19 @@ public class DataJsonService {
                 writer.beginArray();
 
                 int orderId = 0;
+
                 if (items.length > 0) {
                     orderId = items[0].orderId;
 
                     for (ProductItem item : items) {
                         writer.beginObject();
+
                         writer.name("productNumber").value(item.productName);
                         writer.name("price").value(item.price);
                         writer.name("count").value(item.count);
                         writer.name("weight").value(item.weight);
+                        writer.name("checked").value(item.checked);
+
                         writer.endObject();
                     }
                 }

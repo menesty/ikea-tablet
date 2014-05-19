@@ -32,12 +32,10 @@ public class UploadDataTask extends BaseAsyncTask<Object, Integer, Boolean> {
         ApplicationPreferences setting = (ApplicationPreferences) data[0];
 
         try {
-            start(setting);
+            return start(setting);
         } catch (Exception e) {
             return false;
         }
-
-        return true;
     }
 
     private boolean start(ApplicationPreferences setting) throws InterruptedException {

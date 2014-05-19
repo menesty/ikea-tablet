@@ -203,21 +203,18 @@ public abstract class BaseActivity extends Activity implements TaskCallbacks {
             UploadDataTask _task = cast(task);
 
             if (!this.<Boolean>cast(result)) {
-                if (!this.<Boolean>cast(result)) {
-                    lockScreenOrientation();
-                    Toast.makeText(this, R.string.internetConnectionProblemTitle, Toast.LENGTH_LONG).show();
+                lockScreenOrientation();
+                Toast.makeText(this, R.string.internetConnectionProblemTitle, Toast.LENGTH_LONG).show();
 
-                    TaskFragment<Boolean> mTaskFragment = cast(getFragmentManager().findFragmentByTag(_task.UUID));
-                    getFragmentManager().beginTransaction().remove(mTaskFragment).commit();
+                TaskFragment<Boolean> mTaskFragment = cast(getFragmentManager().findFragmentByTag(_task.UUID));
+                getFragmentManager().beginTransaction().remove(mTaskFragment).commit();
 
-                    uploadData(_task.UUID, _task.data);
+                uploadData(_task.UUID, _task.data);
 
-                    unlockScreenOrientation();
-                } else
-                    onUpload(_task.UUID);
-
+                unlockScreenOrientation();
             } else
                 onUpload(_task.UUID);
+
         }
     }
 
