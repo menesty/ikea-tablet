@@ -2,6 +2,8 @@ package org.menesty.ikea.tablet;
 
 import android.app.ActionBar;
 import android.app.FragmentTransaction;
+import android.view.MenuItem;
+import android.widget.PopupMenu;
 import org.menesty.ikea.tablet.component.ParagonViewFragment;
 
 public class TabListener implements ActionBar.TabListener {
@@ -20,6 +22,23 @@ public class TabListener implements ActionBar.TabListener {
         ft.remove(fragment);
     }
 
-    public void onTabReselected(ActionBar.Tab tab, FragmentTransaction ft) {
+    public void onTabReselected(ActionBar.Tab tab, final FragmentTransaction ft) {
+        if (fragment.isUploaded()) {
+            //ContextMenu menu
+            PopupMenu popup = new PopupMenu(fragment.getActivity(), fragment.getView());
+            popup.inflate(R.menu.tab_actions);
+
+            popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                @Override
+                public boolean onMenuItemClick(MenuItem item) {
+                    ((BaseActivity) fragment.getActivity()).cancel(fragment.UUID);
+
+                    return true;
+                }
+            });
+
+            popup.show();
+        }
+
     }
 }

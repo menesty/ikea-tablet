@@ -120,7 +120,7 @@ public class TabletActivity extends BaseActivity implements TaskCallbacks, LoadD
 
             if (afterCrash) {
                 if (i != 0) {
-                    uploadData(tab.UUID, tab.getData(), 1);
+                    uploadData(tab.UUID, tab.getData());
                     aTab.setIcon(R.drawable.ic_action_upload);
                 }
             } else {
@@ -377,9 +377,8 @@ public class TabletActivity extends BaseActivity implements TaskCallbacks, LoadD
     }
 
     private ActiveParagonViewFragment getActive() {
-        return this.cast(tabs.get(0));
+        return BaseActivity.cast(tabs.get(0));
     }
-
 
 
     @Override
@@ -414,8 +413,26 @@ public class TabletActivity extends BaseActivity implements TaskCallbacks, LoadD
     @Override
     protected void onUpload(String uuid) {
         for (int i = 0; i < tabs.size(); i++)
-            if (tabs.get(i).UUID.equals(uuid))
+            if (tabs.get(i).UUID.equals(uuid)) {
                 getActionBar().getTabAt(i).setIcon(null);
+                tabs.get(i).setUploaded(true);
+                break;
+            }
+    }
+
+    @Override
+    protected void onCancel(String uuid) {
+        for (int i = 0; i < tabs.size(); i++)
+            if (tabs.get(i).UUID.equals(uuid)) {
+                tabs.get(0).reset();
+                tabs.get(0).setData(tabs.get(i).getData());
+
+                getActionBar().removeTabAt(i);
+                tabs.remove(i);
+
+                updateTabNames();
+                break;
+            }
     }
 
     public void refresh(MenuItem menuItem) {

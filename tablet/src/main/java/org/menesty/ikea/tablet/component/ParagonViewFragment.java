@@ -23,6 +23,8 @@ public class ParagonViewFragment extends Fragment {
 
     private List<ProductItem[]> data;
 
+    private boolean uploaded;
+
     public ParagonViewFragment() {
         UUID = generateUUID();
     }
@@ -32,7 +34,7 @@ public class ParagonViewFragment extends Fragment {
         this.data = data;
     }
 
-    public static String generateUUID(){
+    public static String generateUUID() {
         return java.util.UUID.randomUUID().toString();
     }
 
@@ -42,6 +44,18 @@ public class ParagonViewFragment extends Fragment {
         init(view);
 
         return view;
+    }
+
+    public void setData(List<ProductItem[]> data) {
+        this.data = data;
+    }
+
+    public boolean isUploaded() {
+        return uploaded;
+    }
+
+    public void setUploaded(boolean uploaded) {
+        this.uploaded = uploaded;
     }
 
     @Override

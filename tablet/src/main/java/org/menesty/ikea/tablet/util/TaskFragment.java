@@ -105,9 +105,9 @@ public class TaskFragment<Result> extends Fragment implements TaskListener<Resul
         int currentOrientation = getResources().getConfiguration().orientation;
 
         if (currentOrientation == Configuration.ORIENTATION_PORTRAIT)
-            getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+            getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT);
         else
-            getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+            getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
     }
 
     private void unlockScreenOrientation() {

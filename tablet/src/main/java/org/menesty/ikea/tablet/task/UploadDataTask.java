@@ -2,6 +2,7 @@ package org.menesty.ikea.tablet.task;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.util.EntityUtils;
@@ -95,17 +96,12 @@ public class UploadDataTask extends BaseAsyncTask<Object, Integer, Boolean> {
         String desUrl = setting.getServerName() + "/paragon/check/" + actionId;
 
         HttpClient httpclient = HttpUtil.createClient();
-        StringEntity se = new StringEntity(this.data);
-        URL url = new URL(desUrl);
+        HttpGet httpGet = new HttpGet(desUrl);
 
-        HttpPost httpPost = new HttpPost(desUrl);
-        httpPost.setEntity(se);
-
-        HttpResponse httpResponse = httpclient.execute(httpPost, HttpUtil.createAuthContext(url, setting));
+        HttpResponse httpResponse = httpclient.execute(httpGet, HttpUtil.createAuthContext(new URL(desUrl), setting));
 
         String response = EntityUtils.toString(httpResponse.getEntity());
-        Boolean result = Boolean.valueOf(response);
 
-        return result;
+        return Boolean.valueOf(response);
     }
 }

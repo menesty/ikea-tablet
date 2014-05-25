@@ -16,10 +16,7 @@ import org.menesty.ikea.tablet.component.ParagonViewFragment;
 import org.menesty.ikea.tablet.data.DataJsonService;
 import org.menesty.ikea.tablet.domain.AvailableProductItem;
 import org.menesty.ikea.tablet.domain.ProductItem;
-import org.menesty.ikea.tablet.task.BaseAsyncTask;
-import org.menesty.ikea.tablet.task.ErrorDataTask;
-import org.menesty.ikea.tablet.task.TaskCallbacks;
-import org.menesty.ikea.tablet.task.UploadDataTask;
+import org.menesty.ikea.tablet.task.*;
 import org.menesty.ikea.tablet.util.TaskFragment;
 
 import java.io.*;
@@ -149,9 +146,9 @@ public abstract class BaseActivity extends Activity implements TaskCallbacks {
         int currentOrientation = getResources().getConfiguration().orientation;
 
         if (currentOrientation == Configuration.ORIENTATION_PORTRAIT)
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT);
         else
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
 
     }
 
@@ -173,16 +170,23 @@ public abstract class BaseActivity extends Activity implements TaskCallbacks {
         actionBar.addTab(aTab, 1);
 
         //update tab names
-        for (int i = 0; i < actionBar.getTabCount(); i++)
-            if (i != 0)
-                actionBar.getTabAt(i).setText(i + "");
+        updateTabNames();
 
-        uploadData(tab.UUID, data, 0);
+        uploadData(tab.UUID, data);
 
         return tab;
     }
 
-    protected void uploadData(final String uuid, List<ProductItem[]> data, int tryCount) {
+    protected void updateTabNames() {
+        ActionBar actionBar = getActionBar();
+
+        for (int i = 0; i < actionBar.getTabCount(); i++)
+            if (i != 0)
+                actionBar.getTabAt(i).setText(i + "");
+
+    }
+
+    protected void uploadData(final String uuid, List<ProductItem[]> data) {
         DataJsonService service = new DataJsonService();
         String result = service.serializeParagons(uuid, data);
 
@@ -202,21 +206,43 @@ public abstract class BaseActivity extends Activity implements TaskCallbacks {
         if (task instanceof UploadDataTask) {
             UploadDataTask _task = cast(task);
 
-            if (!this.<Boolean>cast(result)) {
+            TaskFragment<Boolean> mTaskFragment = cast(getFragmentManager().findFragmentByTag(_task.UUID));
+
+            if (!BaseActivity.<Boolean>cast(result)) {
                 lockScreenOrientation();
                 Toast.makeText(this, R.string.internetConnectionProblemTitle, Toast.LENGTH_LONG).show();
 
-                TaskFragment<Boolean> mTaskFragment = cast(getFragmentManager().findFragmentByTag(_task.UUID));
                 getFragmentManager().beginTransaction().remove(mTaskFragment).commit();
 
                 uploadData(_task.UUID, _task.data);
 
                 unlockScreenOrientation();
-            } else
+            } else {
                 onUpload(_task.UUID);
+                getFragmentManager().beginTransaction().remove(mTaskFragment).commit();
+            }
 
+        } else if (task instanceof CancelParagonTask) {
+            CancelParagonTask _task = cast(task);
+
+            TaskFragment<Boolean> mTaskFragment = cast(getFragmentManager().findFragmentByTag("cancel_" + _task.UUID));
+
+            if (BaseActivity.<Boolean>cast(result))
+                onCancel(_task.UUID);
+
+            getFragmentManager().beginTransaction().remove(mTaskFragment).commit();
         }
     }
 
     protected abstract void onUpload(String uuid);
+
+    protected abstract void onCancel(String uuid);
+
+    public void cancel(final String uuid) {
+        TaskFragment<Boolean> mTaskFragment = new TaskFragment<Boolean>(true, false);
+
+        mTaskFragment.start(new CancelParagonTask(uuid), SettingService.getSetting(this));
+        getFragmentManager().beginTransaction().add(mTaskFragment, "cancel_" + uuid).commit();
+    }
+
 }
