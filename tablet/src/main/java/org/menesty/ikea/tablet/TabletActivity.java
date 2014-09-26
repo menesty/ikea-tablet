@@ -82,17 +82,35 @@ public class TabletActivity extends BaseActivity implements TaskCallbacks, LoadD
             }
     }
 
+    @Override
+    protected void setActiveTab(ActiveParagonViewFragment activeTab) {
+        tabs.set(0, activeTab);
+        getActionBar().removeTabAt(0);
+
+        ActionBar actionBar = getActionBar();
+        ActionBar.Tab tab = actionBar.newTab().setText("Active");
+
+        tab.setTabListener(new TabListener(tabs.get(0)));
+        actionBar.addTab(tab, 0);
+
+        tab.select();
+
+    }
+
     private void saveTabState(Bundle outState) {
         for (int i = 0; i < tabs.size(); i++) {
             ParagonViewFragment tab = tabs.get(i);
 
             List<ProductItem[]> data = tab.getData();
 
+            if (data == null)
+                continue;
+
             for (int j = 0; j < data.size(); j++)
                 outState.putParcelableArray("tab_" + i + "_view_" + j, data.get(j));
 
             outState.putInt("tab_" + i + "_view_count", +data.size());
-            outState.putString("tab_" + i + "_action_id", tab.UUID);
+            outState.putString("tab_" + i + "_action_id", tab.getUUID());
         }
 
         outState.putInt("tab_count", +tabs.size());
@@ -120,11 +138,11 @@ public class TabletActivity extends BaseActivity implements TaskCallbacks, LoadD
 
             if (afterCrash) {
                 if (i != 0) {
-                    uploadData(tab.UUID, tab.getData());
+                    uploadData(tab.getUUID(), tab.getData());
                     aTab.setIcon(R.drawable.ic_action_upload);
                 }
             } else {
-                TaskFragment<Boolean> task = cast(getFragmentManager().findFragmentByTag(tab.UUID));
+                TaskFragment<Boolean> task = cast(getFragmentManager().findFragmentByTag(tab.getUUID()));
 
                 if (task != null)
                     aTab.setIcon(R.drawable.ic_action_upload);
@@ -255,7 +273,7 @@ public class TabletActivity extends BaseActivity implements TaskCallbacks, LoadD
             List<ProductItem[]> data = getActive().getData();
 
             if (data.size() != 0) {
-                tabs.add(1, uploadData(data));
+                tabs.add(1, uploadData(getActive().getUUID(), data));
                 getActive().reset();
             }
         }
@@ -413,8 +431,10 @@ public class TabletActivity extends BaseActivity implements TaskCallbacks, LoadD
     @Override
     protected void onUpload(String uuid) {
         for (int i = 0; i < tabs.size(); i++)
-            if (tabs.get(i).UUID.equals(uuid)) {
-                getActionBar().getTabAt(i).setIcon(null);
+            if (tabs.get(i).getUUID().equals(uuid)) {
+                if (getActionBar().getTabAt(i) != null)
+                    getActionBar().getTabAt(i).setIcon(null);
+
                 tabs.get(i).setUploaded(true);
                 break;
             }
@@ -423,7 +443,7 @@ public class TabletActivity extends BaseActivity implements TaskCallbacks, LoadD
     @Override
     protected void onCancel(String uuid) {
         for (int i = 0; i < tabs.size(); i++)
-            if (tabs.get(i).UUID.equals(uuid)) {
+            if (tabs.get(i).getUUID().equals(uuid)) {
                 tabs.get(0).reset();
                 tabs.get(0).setData(tabs.get(i).getData());
 

@@ -22,7 +22,8 @@ public class ProductItem implements Parcelable {
         checked = value[0];
     }
 
-    public ProductItem(String productId, String productName, String shortName, double count, double price, double weight, int orderId, boolean checked) {
+    public ProductItem(String productId, String productName, String shortName, double count, double price, double weight,
+                       int orderId, boolean checked) {
         this.artNumber = productId;
         this.productName = productName;
         this.shortName = shortName;

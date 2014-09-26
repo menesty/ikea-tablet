@@ -19,13 +19,21 @@ import java.util.List;
 
 public class ParagonViewFragment extends Fragment {
 
-    public final String UUID;
+    private String UUID;
 
     private List<ProductItem[]> data;
 
     private boolean uploaded;
 
     public ParagonViewFragment() {
+        newUUID();
+    }
+
+    public String getUUID() {
+        return UUID;
+    }
+
+    protected void newUUID() {
         UUID = generateUUID();
     }
 

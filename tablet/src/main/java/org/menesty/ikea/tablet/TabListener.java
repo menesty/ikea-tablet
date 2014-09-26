@@ -31,7 +31,7 @@ public class TabListener implements ActionBar.TabListener {
             popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                 @Override
                 public boolean onMenuItemClick(MenuItem item) {
-                    ((BaseActivity) fragment.getActivity()).cancel(fragment.UUID);
+                    ((BaseActivity) fragment.getActivity()).cancel(fragment.getUUID());
 
                     return true;
                 }

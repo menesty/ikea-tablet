@@ -30,4 +30,10 @@ public class ActiveParagonViewFragment extends ParagonViewFragment {
     protected boolean showEditWeightDialog() {
         return true;
     }
+
+    @Override
+    public void reset() {
+        newUUID();
+        super.reset();
+    }
 }

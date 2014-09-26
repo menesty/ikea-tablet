@@ -37,6 +37,8 @@
     <string name="delete_paragon">Видалити Парагон</string>
     <string name="refresh">Оновити</string>
     <string name="exit">Вихід</string>
+    <string name="history">Історія</string>
+    <string name="date">Дата</string>
 
     <string name="loading">Завантаження</string>
     <string name="wait_msg">Зачекайте хвильку!</string>

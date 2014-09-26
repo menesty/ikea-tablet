@@ -2,6 +2,7 @@ package org.menesty.ikea.tablet;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.app.FragmentManager;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
@@ -12,9 +13,14 @@ import android.os.Parcelable;
 import android.view.MenuItem;
 import android.view.WindowManager;
 import android.widget.Toast;
+import org.menesty.ikea.tablet.component.ActiveParagonViewFragment;
 import org.menesty.ikea.tablet.component.ParagonViewFragment;
 import org.menesty.ikea.tablet.data.DataJsonService;
+import org.menesty.ikea.tablet.db.DatabaseHelper;
+import org.menesty.ikea.tablet.db.HistoryReaderContract;
+import org.menesty.ikea.tablet.dialog.HistoryChoiceDialog;
 import org.menesty.ikea.tablet.domain.AvailableProductItem;
+import org.menesty.ikea.tablet.domain.History;
 import org.menesty.ikea.tablet.domain.ProductItem;
 import org.menesty.ikea.tablet.task.*;
 import org.menesty.ikea.tablet.util.TaskFragment;
@@ -26,6 +32,7 @@ import java.util.Locale;
 
 public abstract class BaseActivity extends Activity implements TaskCallbacks {
     private static final String BACKUP_DATA_FILE = "backup.data";
+    private DatabaseHelper db;
 
     public BaseActivity() {
         SettingService.init(this);
@@ -45,6 +52,8 @@ public abstract class BaseActivity extends Activity implements TaskCallbacks {
         super.onCreate(savedInstanceState);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         initDefaultLanguage();
+
+        db = new DatabaseHelper(getApplicationContext());
     }
 
     private void initDefaultLanguage() {
@@ -159,10 +168,10 @@ public abstract class BaseActivity extends Activity implements TaskCallbacks {
     /*
     move all item from active tab and send it to server
      */
-    protected ParagonViewFragment uploadData(List<ProductItem[]> data) {
+    protected ParagonViewFragment uploadData(String actionId, List<ProductItem[]> data) {
         ActionBar actionBar = getActionBar();
 
-        ParagonViewFragment tab = new ParagonViewFragment(ParagonViewFragment.generateUUID(), data);
+        ParagonViewFragment tab = new ParagonViewFragment(actionId == null ? ParagonViewFragment.generateUUID() : actionId, data);
 
         ActionBar.Tab aTab = actionBar.newTab().setTabListener(new TabListener(tab));
         aTab.setIcon(R.drawable.ic_action_upload);
@@ -172,7 +181,7 @@ public abstract class BaseActivity extends Activity implements TaskCallbacks {
         //update tab names
         updateTabNames();
 
-        uploadData(tab.UUID, data);
+        sendData(tab.getUUID(), data);
 
         return tab;
     }
@@ -183,14 +192,15 @@ public abstract class BaseActivity extends Activity implements TaskCallbacks {
         for (int i = 0; i < actionBar.getTabCount(); i++)
             if (i != 0)
                 actionBar.getTabAt(i).setText(i + "");
-
     }
 
-    protected void uploadData(final String uuid, List<ProductItem[]> data) {
+    protected void sendData(final String uuid, List<ProductItem[]> data) {
         DataJsonService service = new DataJsonService();
         String result = service.serializeParagons(uuid, data);
 
         uploadData(uuid, result);
+        HistoryReaderContract.save(db.getWritableDatabase(), uuid, data);
+
     }
 
     private void uploadData(String uuid, String data) {
@@ -198,7 +208,6 @@ public abstract class BaseActivity extends Activity implements TaskCallbacks {
 
         mTaskFragment.start(new UploadDataTask(uuid, data), SettingService.getSetting(this));
         getFragmentManager().beginTransaction().add(mTaskFragment, uuid).commit();
-
     }
 
     @Override
@@ -244,5 +253,32 @@ public abstract class BaseActivity extends Activity implements TaskCallbacks {
         mTaskFragment.start(new CancelParagonTask(uuid), SettingService.getSetting(this));
         getFragmentManager().beginTransaction().add(mTaskFragment, "cancel_" + uuid).commit();
     }
+
+    public void history(MenuItem menuItem) {
+        FragmentManager fm = getFragmentManager();
+        HistoryChoiceDialog dialog = (HistoryChoiceDialog) fm.findFragmentByTag("HistoryChoiceDialog");
+
+        if (dialog == null) {
+            dialog = new HistoryChoiceDialog();
+            dialog.setListener(new HistoryChoiceDialog.ItemSelectListener() {
+                @Override
+                public void onItemSelect(History item) {
+                    List<ProductItem[]> data = HistoryReaderContract.loadItems(item, db.getReadableDatabase());
+                    setActiveTabData(item.getActionId(), data);
+                }
+            });
+        }
+
+        History[] items = HistoryReaderContract.loadItems(db.getReadableDatabase());
+        dialog.setAvailableHistories(items);
+        dialog.show(fm, "ProductChoiceDialog");
+
+    }
+
+    private void setActiveTabData(String uuid, List<ProductItem[]> data) {
+        setActiveTab(new ActiveParagonViewFragment(uuid, data));
+    }
+
+    protected abstract void setActiveTab(ActiveParagonViewFragment activeTab);
 
 }

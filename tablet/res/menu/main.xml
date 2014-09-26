@@ -16,12 +16,18 @@
             android:id="@+id/send_product"
             android:icon="@drawable/ic_action_send_now"
             android:showAsAction="always"
-            android:onClick="sendToServer" />
+            android:onClick="sendToServer"
+            android:title="Send"/>
 
     <item
             android:showAsAction="never|withText"
             android:onClick="settings"
             android:title="@string/settings" />
+
+    <item
+            android:showAsAction="never|withText"
+            android:onClick="history"
+            android:title="@string/history" />
 
     <item
             android:id="@+id/refresh"
